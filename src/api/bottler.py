@@ -3,6 +3,9 @@ from enum import Enum
 from pydantic import BaseModel
 from src.api import auth
 
+import sqlalchemy
+from src import database as db
+
 router = APIRouter(
     prefix="/bottler",
     tags=["bottler"],
@@ -15,7 +18,9 @@ class PotionInventory(BaseModel):
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
-    """ """
+    
+
+    print("I am in this function")
     print(potions_delivered)
 
     return "OK"
