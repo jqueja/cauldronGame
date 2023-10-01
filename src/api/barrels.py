@@ -31,11 +31,10 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     """ """
-    print(wholesale_catalog)
 
     return [
         {
             "sku": "SMALL_RED_BARREL",
-            "quantity": 5,
+            "quantity": getRedPotions(),
         }
     ]

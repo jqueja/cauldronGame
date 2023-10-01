@@ -11,6 +11,7 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
+dctCart = {}
 
 class NewCart(BaseModel):
     customer: str
@@ -19,7 +20,7 @@ class NewCart(BaseModel):
 @router.post("/")
 def create_cart(new_cart: NewCart):
     """ """
-    return {"cart_id": 1}
+    return {"cart_id": NewCart.customer}
 
 
 @router.get("/{cart_id}")
@@ -33,9 +34,19 @@ class CartItem(BaseModel):
     quantity: int
 
 
+# Use a python dct
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
-    """ """
+
+
+    # If the customer already exists, update the value
+    if cart_id in dctCart:
+        info = dctCart[cart_id]
+        info[1] = cart_item.quantity
+        
+
+    # The customer is new, so make a cart for them
+    dctCart[cart_id] = [item_sku, cart_item.quantity] 
 
     return "OK"
 
@@ -47,4 +58,6 @@ class CartCheckout(BaseModel):
 def checkout(cart_id: int, cart_checkout: CartCheckout):
     """ """
 
-    return {"total_potions_bought": 1, "total_gold_paid": 50}
+    
+
+    return {"total_potions_bought": 1, "total_gold_paid": cart_checkout.payment}
