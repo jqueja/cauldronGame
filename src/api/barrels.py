@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from src.api import auth
 
+from ..database import *
+
+
 router = APIRouter(
     prefix="/barrels",
     tags=["barrels"],
@@ -33,6 +36,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     return [
         {
             "sku": "SMALL_RED_BARREL",
-            "quantity": 1,
+            "quantity": getRed,
         }
     ]

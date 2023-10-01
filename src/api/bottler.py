@@ -23,7 +23,6 @@ class PotionInventory(BaseModel):
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     
 
-    print("I am in this function")
     print(potions_delivered)
 
     return "OK"
@@ -41,6 +40,9 @@ def get_bottle_plan():
 
     # Initial logic: bottle all barrels into red potions.
 
+    # INCREASED Red Potions
+    # DECREASED Red ml
+
     curRedml = getRedml()
 
     # How much potions can be created
@@ -50,8 +52,12 @@ def get_bottle_plan():
     subtractml = potionsCreate * 100
 
     newml = curRedml - subtractml
-
     setRedml(newml)
+
+    curPotions = getRedPotions()
+
+    # Take the current amount of potions and add the new ones
+    setRedPotions(curPotions + potionsCreate)
 
     return [
             {
