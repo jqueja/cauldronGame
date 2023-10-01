@@ -6,6 +6,9 @@ from src.api import auth
 import sqlalchemy
 from src import database as db
 
+from ..database import *
+
+
 router = APIRouter(
     prefix="/bottler",
     tags=["bottler"],
@@ -38,9 +41,21 @@ def get_bottle_plan():
 
     # Initial logic: bottle all barrels into red potions.
 
+    curRedml = getRedml()
+
+    # How much potions can be created
+    potionsCreate = curRedml // 100
+
+    # Amount of how much to take out
+    subtractml = potionsCreate * 100
+
+    newml = curRedml - subtractml
+
+    setRedml(newml)
+
     return [
             {
                 "potion_type": [100, 0, 0, 0],
-                "quantity": 5,
+                "quantity": getRedPotions(),
             }
         ]

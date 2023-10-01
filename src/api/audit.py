@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from src.api import auth
 import math
 
-from ..database import getRedPotions
+from ..database import *
 
 router = APIRouter(
     prefix="/audit",
@@ -14,9 +14,10 @@ router = APIRouter(
 @router.get("/inventory")
 def get_inventory():
 
-    
-
-    return {"number_of_potions": getRedPotions(), "ml_in_barrels": 0, "gold": 0}
+    return {"number_of_potions": getRedPotions(),
+            "ml_in_barrels": getRedml(),
+            "gold": getGold()
+            }
 
 class Result(BaseModel):
     gold_match: bool
