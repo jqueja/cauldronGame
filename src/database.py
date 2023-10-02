@@ -15,7 +15,7 @@ engine = create_engine(database_connection_url(), pool_pre_ping=True)
 def getRedPotions():
     #print("In the helper GET red potions")
 
-    query = "SELECT num_red_potions FROM global_inventory"
+    query = """SELECT num_red_potions FROM global_inventory"""
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
@@ -26,7 +26,7 @@ def getRedPotions():
 def getRedml():
     #print("In the helper GET red mL")
 
-    query = "SELECT num_red_ml FROM global_inventory"
+    query = """SELECT num_red_ml FROM global_inventory"""
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
@@ -37,7 +37,7 @@ def getRedml():
 def getGold():
     #print("In the helper GET gold")
 
-    query = "SELECT gold FROM global_inventory"
+    query = """SELECT gold FROM global_inventory"""
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
@@ -48,7 +48,9 @@ def getGold():
 def setRedPotions(num):
     #print("In the helper SET red potions")
 
-    query = f"UPDATE global_inventory SET num_red_potions = {num}"
+    query = f"""
+    UPDATE global_inventory SET num_red_potions = {num}
+"""
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
@@ -58,7 +60,9 @@ def setRedPotions(num):
 def setRedml(num):
     #print("In the helper SET red potions")
 
-    query = f"UPDATE global_inventory SET num_red_ml = {num}"
+    query = f"""
+    UPDATE global_inventory SET num_red_ml = {num}
+"""
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
