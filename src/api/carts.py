@@ -1,9 +1,14 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException, status
 from pydantic import BaseModel
 from src.api import auth
 
 import sqlalchemy
 from src import database as db
+
+from ..database import *
+
+
+# Added the HTTPException and status
 
 router = APIRouter(
     prefix="/carts",
@@ -27,6 +32,8 @@ def create_cart(new_cart: NewCart):
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
 
+    global dctCart
+
     print(dctCart)
     
     cartInfo = dctCart[cart_id]
@@ -47,6 +54,7 @@ class CartItem(BaseModel):
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 
+    global dctCart
 
     # If the customer already exists, update the value
     if cart_id in dctCart:
@@ -64,23 +72,43 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 
 class CartCheckout(BaseModel):
     payment: str
-    
+
 # gold increases, potions decreate
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
 
     cartInfo = dctCart[cart_id]
 
+    #cartInfo[0] = item
+    #cartInfo[1] = quantity
+
     if cartInfo:
-        print("It exists")
+        curRedPotions = getRedPotions()
+        quantity = cartInfo[1]
 
         # Check if we have enough, if we do sell
+    
+        # Assuming that they want Red Potions
+        if quantity <= curRedPotions:
+            newPotions = curRedPotions - quantity
+            setRedPotions(newPotions)
 
-        # else: Send HTTP Error (customer wants too much)
+            goldAmount = getGold() + int(cart_checkout.payment)
+            setGold(goldAmount)
+
+            return {"total_potions_bought": quantity, "total_gold_paid": cart_checkout.payment}
+
+        # Don't have enough to sell
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Customer wants too much, don't have enough to sell"
+            )
 
 
     # Item does not exist, send HTTP Error
     else:
-        print("Item does not exist")
-
-    return {"total_potions_bought": 1, "total_gold_paid": cart_checkout.payment}
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="cart_id does not exist, cart not created"
+        )
