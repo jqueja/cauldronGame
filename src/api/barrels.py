@@ -37,8 +37,9 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 setRedml(getRedml() + curBarrel.ml_per_barrel)
                 setGold(getGold() - curBarrel.price)
 
+    # Wasn't sure on how to return just red barrels and how much I bought
 
-    return "OK"
+    return "ok"
 
 # Gets called once a day
 # see how much gold and see what I can purchase

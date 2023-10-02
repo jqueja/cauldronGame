@@ -48,12 +48,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             # Take the current amount of potions and add the new ones
             setRedPotions(curPotions + potionsCreate)
 
-    return [
-            {
-                "potion_type": [100, 0, 0, 0],
-                "quantity": potionsCreate,
-            }
-        ]
+    return "ok"
 # Gets called 4 times a day
 # return potions type and quantity
 @router.post("/plan")
