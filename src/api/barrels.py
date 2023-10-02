@@ -31,11 +31,11 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         curBarrel = barrels_delivered[i]
 
         # Only buy red barrels
-        if curBarrel.sku == "SMALL_RED_BARREL":
+        #if curBarrel.sku == "SMALL_RED_BARREL":
             
-            if curBarrel.price <= curGold:
-                setRedml(getRedml() + curBarrel.ml_per_barrel)
-                setGold(getGold() - curBarrel.price)
+        if curBarrel.price <= curGold:
+            setRedml(getRedml() + curBarrel.ml_per_barrel)
+            setGold(getGold() - curBarrel.price)
 
     # Wasn't sure on how to return just red barrels and how much I bought
 

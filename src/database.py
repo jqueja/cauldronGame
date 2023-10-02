@@ -68,7 +68,9 @@ def setRedml(num):
 def setGold(num):
     #print("In the helper SET red potions")
 
-    query = f"UPDATE global_inventory SET gold = {num}"
+    query = f"""
+    UPDATE global_inventory SET gold = {num}
+    """
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
