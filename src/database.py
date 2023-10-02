@@ -50,7 +50,7 @@ def setRedPotions(num):
 
     query = f"""
     UPDATE global_inventory SET num_red_potions = {num}
-"""
+    """
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
@@ -62,7 +62,7 @@ def setRedml(num):
 
     query = f"""
     UPDATE global_inventory SET num_red_ml = {num}
-"""
+    """
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
