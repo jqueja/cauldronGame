@@ -24,10 +24,11 @@ def reset():
     setGold(100)
 
     # clears the global dct
-    global dctCart
-    dctCart.clear()
 
-    print(dctCart)
+    #global dctCart
+    #dctCart.clear()
+
+    #print(dctCart)
 
 
     return "OK"
