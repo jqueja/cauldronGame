@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from src.api import auth
 
 from ..database import *
+from .carts import dctCart
 
 
 router = APIRouter(
@@ -21,6 +22,13 @@ def reset():
     setRedPotions(0)
     setRedml(0)
     setGold(100)
+
+    # clears the global dct
+    global dctCart
+    dctCart.clear()
+
+    print(dctCart)
+
 
     return "OK"
 

@@ -16,6 +16,7 @@ def get_catalog():
 
     # Can return a max of 20 items.
 
+    '''
     amountReturn = 0
 
     redPotions = getRedPotions()
@@ -25,12 +26,13 @@ def get_catalog():
     
     else:
         amountReturn = redPotions
+    '''
 
     return [
             {
                 "sku": "RED_POTION",
                 "name": "red potion",
-                "quantity": amountReturn,
+                "quantity": getRedPotions(),
                 "price": 50,
                 "potion_type": [100, 0, 0, 0],
             }
