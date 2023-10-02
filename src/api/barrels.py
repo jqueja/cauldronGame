@@ -60,10 +60,12 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             if curBarrel.price <= curGold:
                 counter += 1
 
-
-    return [
-        {
-            "sku": "SMALL_RED_BARREL",
-            "quantity": counter,
-        }
-    ]
+    if counter > 0:
+        return [
+            {
+                "sku": "SMALL_RED_BARREL",
+                "quantity": counter,
+            }
+        ]
+    else:
+        return []
