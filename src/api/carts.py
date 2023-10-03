@@ -77,10 +77,12 @@ class CartCheckout(BaseModel):
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
 
+
     cartInfo = dctCart[cart_id]
 
-    #cartInfo[0] = item
-    #cartInfo[1] = quantity
+    print(cartInfo[0])
+    print(cartInfo[1])
+ 
 
     if cartInfo:
         curRedPotions = getRedPotions()
@@ -93,10 +95,12 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             newPotions = curRedPotions - quantity
             setRedPotions(newPotions)
 
-            goldAmount = getGold() + int(cart_checkout.payment)
+            goldPayment = 50 * quantity
+
+            goldAmount = getGold() + goldPayment
             setGold(goldAmount)
 
-            return {"total_potions_bought": quantity, "total_gold_paid": cart_checkout.payment}
+            return {"total_potions_bought": quantity, "total_gold_paid": goldAmount}
 
         # Don't have enough to sell
         else:
