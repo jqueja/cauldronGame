@@ -100,7 +100,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             goldAmount = getGold() + goldPayment
             setGold(goldAmount)
 
-            return {"total_potions_bought": quantity, "total_gold_paid": goldAmount}
+            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
 
         # Don't have enough to sell
         else:
