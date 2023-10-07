@@ -31,41 +31,67 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         curBarrel = barrels_delivered[i]
 
         # Only buy red barrels
-        #if curBarrel.sku == "SMALL_RED_BARREL":
+        if curBarrel.sku == "SMALL_RED_BARREL":
             
-        if curBarrel.price <= curGold:
-            setRedml(getRedml() + curBarrel.ml_per_barrel)
-            setGold(curGold - curBarrel.price)
-
-    # Wasn't sure on how to return just red barrels and how much I bought
+            if curBarrel.price <= curGold:
+                setRedml(getRedml() + curBarrel.ml_per_barrel)
+                setGold(curGold - curBarrel.price)
 
     return "ok"
 
 # Gets called once a day
 # see how much gold and see what I can purchase
 # how many small red barrles I can buy
+
+# Version 2: How much barrels I can buy in general
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
-    counter = 0
+    redCounter = 0
+    greenCounter = 0
+    blueCounter = 0
+
 
     for i in range(len(wholesale_catalog)):
         curGold = getGold()
         curBarrel = wholesale_catalog[i]
 
-        # Only buy red barrels
+        # Checking Red Barrels
         if curBarrel.sku == "SMALL_RED_BARREL":
             
+            if curBarrel.price <= curGold:
+                redCounter += 1
+
+        # Checking Green 
+        elif curBarrel.sku == "SMALL_GREEN_BARREL":
+            if curBarrel.price <= curGold:
+                greenCounter += 1
+
+        # Checking Blue
+        elif curBarrel.sku == "SMALL_BLUE_BARREl":
 
             if curBarrel.price <= curGold:
-                counter += 1
+                blueCounter += 1
 
-    if counter > 0:
+    totalCounter = redCounter + greenCounter + blueCounter
+
+    # We have items to sell! 
+    if totalCounter > 0:
         return [
             {
                 "sku": "SMALL_RED_BARREL",
-                "quantity": counter,
-            }
+                "quantity": redCounter,
+            },
+            {
+                "sku": "SMALL_GREEN_BARREL",
+                "quantity": greenCounter,
+            },
+            {
+                "sku": "SMALL_BLUE_BARREL",
+                "quantity": blueCounter,
+            },
         ]
+    
+    # We have nothing to sell :(
     else:
         return []

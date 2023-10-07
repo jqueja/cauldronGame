@@ -23,6 +23,28 @@ def getRedPotions():
 
         return row.num_red_potions
     
+def getBluePotions():
+    #print("In the helper GET blue potions")
+
+    query = """SELECT num_blue_potions FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_blue_potions
+    
+def getGreenPotions():
+    #print("In the helper GET greenp potions")
+
+    query = """SELECT num_green_potions FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_green_potions
+    
 def getRedml():
     #print("In the helper GET red mL")
 
@@ -80,4 +102,11 @@ def setGold(num):
         result = connection.execute(sqlalchemy.text(query))
         
         return num
-    
+
+
+'''
+NOTE: Future implementations for helper functions.
+
+    1) Have one function that takes in PARAMS: (Potions type and set)
+        - setPotion(type of potion,) GET/SET
+'''

@@ -54,6 +54,7 @@ class CartItem(BaseModel):
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 
+    
     global dctCart
 
     # If the customer already exists, update the value
@@ -62,10 +63,16 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
         info[1] = cart_item.quantity
         
 
-    print(dctCart)
     # The customer is new, so make a cart for them
-    dctCart[cart_id] = [item_sku, cart_item.quantity] 
-    print(dctCart)
+    dctCart[cart_id] = [item_sku, cart_item.quantity]
+    
+    '''
+    print(cart_id)
+    print(item_sku)
+    print(cart_item.quantity)
+
+    #insertOrder(cart_id, item_sku, cart_item.quantity)
+    '''
 
     return "OK"
 
@@ -83,7 +90,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     print(cartInfo[0])
     print(cartInfo[1])
  
-
+    # The cart exists
     if cartInfo:
         curRedPotions = getRedPotions()
         quantity = cartInfo[1]

@@ -10,27 +10,15 @@ router = APIRouter()
 
 @router.get("/catalog/", tags=["catalog"])
 def get_catalog():
-    """
-    Each unique item combination must have only a single price.
-    """
-
-    # Can return a max of 20 items.
-
-    '''
-    amountReturn = 0
-
-    redPotions = getRedPotions()
-
-    if redPotions >= 20:
-        amountReturn = 20
-    
-    else:
-        amountReturn = redPotions
-    '''
 
     numRedPotions =  getRedPotions()
+    numBluePotions = getBluePotions()
+    numGreenPotions = getGreenPotions()
 
-    if numRedPotions == 0:
+    totalPotions = numRedPotions + numBluePotions + numGreenPotions
+
+    # I have no potions to tell
+    if totalPotions == 0:
 
         return []
     
@@ -42,6 +30,20 @@ def get_catalog():
                     "quantity": numRedPotions,
                     "price": 50,
                     "potion_type": [100, 0, 0, 0],
-                }
+                },
+                {
+                    "sku": "BLUE_POTION",
+                    "name": "blue potion",
+                    "quantity": numRedPotions,
+                    "price": 50,
+                    "potion_type": [0, 100, 0, 0],
+                },
+                {
+                    "sku": "GREEN_POTION",
+                    "name": "green potion",
+                    "quantity": numRedPotions,
+                    "price": 50,
+                    "potion_type": [0, 0, 100, 0],
+                },
             ]
 
