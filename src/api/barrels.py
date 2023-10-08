@@ -22,6 +22,8 @@ class Barrel(BaseModel):
 
 # Purchase Battels, increase red ml, check if you can purchase the barrels
 # Only buy red
+'''
+'''
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
@@ -31,11 +33,12 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         curBarrel = barrels_delivered[i]
 
         # Only buy red barrels
-        if curBarrel.sku == "SMALL_RED_BARREL":
-            
-            if curBarrel.price <= curGold:
-                setRedml(getRedml() + curBarrel.ml_per_barrel)
-                setGold(curGold - curBarrel.price)
+        #if curBarrel.sku == "SMALL_RED_BARREL":
+        
+        # Buy all the barrels we can
+        if curBarrel.price <= curGold:
+            setRedml(getRedml() + curBarrel.ml_per_barrel)
+            setGold(curGold - curBarrel.price)
 
     return "ok"
 
