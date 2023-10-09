@@ -22,12 +22,16 @@ class NewCart(BaseModel):
     customer: str
 
 
+cart_id = 0
+
 @router.post("/")
 def create_cart(new_cart: NewCart):
     """ """
     print("Created new Cart")
-    return {"cart_id": new_cart.customer}
+    global cart_id
 
+    cart_id += 1
+    return {"cart_id": cart_id}
 
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
