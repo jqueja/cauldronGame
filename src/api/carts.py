@@ -65,6 +65,8 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 
     # The customer is new, so make a cart for them
     dctCart[cart_id] = [item_sku, cart_item.quantity]
+
+    print(dctCart)
     
     '''
     print(cart_id)
@@ -80,6 +82,87 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 class CartCheckout(BaseModel):
     payment: str
 
+# gold increases, potions decreate
+#NOTE: Check if you have enough
+@router.post("/{cart_id}/checkout")
+def checkout(cart_id: int, cart_checkout: CartCheckout):
+
+    print(dctCart)
+
+
+    cartInfo = dctCart[cart_id]
+
+    print(cartInfo[0])
+    print(cartInfo[1])
+ 
+    # The cart exists
+    if cartInfo:
+        sku = cartInfo[0]
+        quantity = cartInfo[1]
+
+        # Check if we have enough, if we do sell
+    
+        # Assuming that they want Red Potions
+        if sku == "RED_POTION":
+
+            curRedPotions = getRedPotions()
+
+            newPotions = curRedPotions - quantity
+            setRedPotions(newPotions)
+
+            goldPayment = 50 * quantity
+
+            goldAmount = getGold() + goldPayment
+            setGold(goldAmount)
+
+            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
+        
+        elif sku == "GREEN_POTION":
+
+            curGreenPotions = getGreenPotions()
+
+
+            newPotions = curGreenPotions - quantity
+            setGreenPotions(newPotions)
+
+            goldPayment = 50 * quantity
+
+            goldAmount = getGold() + goldPayment
+            setGold(goldAmount)
+
+            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
+        
+        elif sku == "BLUE_POTION":
+
+            curGreenPotions = getGreenPotions()
+
+            newPotions = curGreenPotions - quantity
+            setGreenPotions(newPotions)
+
+            goldPayment = 50 * quantity
+
+            goldAmount = getGold() + goldPayment
+            setGold(goldAmount)
+
+            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
+
+        # Don't have enough to sell
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Customer wants too much, don't have enough to sell"
+            )
+
+
+    # Item does not exist, send HTTP Error
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="cart_id does not exist, cart not created"
+        )
+    
+
+'''
 # gold increases, potions decreate
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
@@ -124,3 +207,4 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="cart_id does not exist, cart not created"
         )
+'''

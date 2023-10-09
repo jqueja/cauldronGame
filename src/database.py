@@ -157,7 +157,7 @@ def setBlueml(num):
     #print("In the helper SET red potions")
 
     query = f"""
-    UPDATE global_inventory SET blue_red_ml = {num}
+    UPDATE global_inventory SET num_blue_ml = {num}
     """
 
     with db.engine.begin() as connection:
