@@ -93,6 +93,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
     # The cart exists
     if cartInfo:
         curRedPotions = getRedPotions()
+        sku = cartInfo[0]
         quantity = cartInfo[1]
 
         # Check if we have enough, if we do sell

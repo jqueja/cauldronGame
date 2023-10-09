@@ -24,6 +24,10 @@ class Barrel(BaseModel):
 # Only buy red
 '''
 '''
+
+'''
+NOTE: Can we trust the call? Do we have to check for potion type as well?
+'''
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
     """ """
@@ -32,13 +36,26 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         curGold = getGold()
         curBarrel = barrels_delivered[i]
 
+        print(curBarrel)
+
         # Only buy red barrels
         #if curBarrel.sku == "SMALL_RED_BARREL":
         
         # Buy all the barrels we can
         if curBarrel.price <= curGold:
-            setRedml(getRedml() + curBarrel.ml_per_barrel)
-            setGold(curGold - curBarrel.price)
+
+            if curBarrel.sku == "SMALL_RED_BARREL":
+                setRedml(getRedml() + curBarrel.ml_per_barrel)
+                setGold(curGold - curBarrel.price)
+
+            elif curBarrel.sku == "SMALL_GREEN_BARREL":
+                setGreenml(getGreenml() + curBarrel.ml_per_barrel)
+                setGold(curGold - curBarrel.price)
+
+            elif  curBarrel.sku == "SMALL_BLUE_BARREL":
+                setRedml(getBlueml() + curBarrel.ml_per_barrel)
+                setGold(curGold - curBarrel.price)
+
 
     return "ok"
 

@@ -52,23 +52,45 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
             curGreenml = getGreenml()
 
-            totalRedml = potions_delivered[i].quantity * 100
+            totalGreenml = potions_delivered[i].quantity * 100
 
             # How much potions can be created
-            potionsCreate = totalRedml // 100
+            potionsCreate = totalGreenml // 100
 
             # Amount of how much to take out
             subtractml = potionsCreate * 100
 
-            newml = curRedml - subtractml
-            setRedml(newml)
+            newml = curGreenml - subtractml
+            setGreenml(newml)
 
-            curPotions = getRedPotions()
+            curPotions = getGreenPotions()
 
             # Take the current amount of potions and add the new ones
-            setRedPotions(curPotions + potionsCreate)
+            setGreenPotions(curPotions + potionsCreate)
+
+        # Blue Potion
+        elif potions_delivered[i].potion_type[2] == 100:
+
+            curBlueml = getBlueml()
+
+            totalBlueml = potions_delivered[i].quantity * 100
+
+            # How much potions can be created
+            potionsCreate = totalBlueml // 100
+
+            # Amount of how much to take out
+            subtractml = potionsCreate * 100
+
+            newml = curBlueml - subtractml
+            setBlueml(newml)
+
+            curPotions = getBluePotions()
+
+            # Take the current amount of potions and add the new ones
+            setBluePotions(curPotions + potionsCreate)
 
     return "ok"
+
 # Gets called 4 times a day
 # return potions type and quantity
 @router.post("/plan")
@@ -87,16 +109,28 @@ def get_bottle_plan():
     # DECREASED Red ml
 
     curRedml = getRedml()
+    curGreenml = getGreenml()
+    curBlueml = getBlueml()
 
     # How much potions can be created
-    potionsCreate = curRedml // 100
+    redCreate = curRedml // 100
+    greenCreate = curGreenml // 100
+    blueCreate = curBlueml // 100
 
 
     return [
             {
                 "potion_type": [100, 0, 0, 0],
-                "quantity": potionsCreate,
-            }
+                "quantity": redCreate,
+            },
+            {
+                "potion_type": [0, 100, 0, 0],
+                "quantity": greenCreate,
+            },
+            {
+                "potion_type": [0, 0, 100, 0],
+                "quantity": blueCreate,
+            },
         ]
 
 

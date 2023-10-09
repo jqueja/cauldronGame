@@ -74,7 +74,7 @@ def getGreenPotions():
         result = connection.execute(sqlalchemy.text(query))
         row = result.first()
 
-        return row.num_red_potions
+        return row.num_green_potions
     
 def setGreenPotions(num):
     #print("In the helper SET red potions")
@@ -97,7 +97,7 @@ def getGreenml():
         result = connection.execute(sqlalchemy.text(query))
         row = result.first()
 
-        return row.num_red_ml
+        return row.num_green_ml
     
 def setGreenml(num):
     #print("In the helper SET red potions")
@@ -151,7 +151,7 @@ def getBlueml():
         result = connection.execute(sqlalchemy.text(query))
         row = result.first()
 
-        return row.num_red_ml
+        return row.num_blue_ml
     
 def setBlueml(num):
     #print("In the helper SET red potions")
