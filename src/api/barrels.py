@@ -53,7 +53,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 setGold(curGold - curBarrel.price)
 
             elif  curBarrel.sku == "SMALL_BLUE_BARREL":
-                setRedml(getBlueml() + curBarrel.ml_per_barrel)
+                setBlueml(getBlueml() + curBarrel.ml_per_barrel)
                 setGold(curGold - curBarrel.price)
 
 

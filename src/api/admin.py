@@ -20,7 +20,11 @@ def reset():
     """
 
     setRedPotions(0)
+    setGreenPotions(0)
+    setBluePotions(0)
     setRedml(0)
+    setGreenml(0)
+    setBlueml(0)
     setGold(100)
 
     # clears the global dct

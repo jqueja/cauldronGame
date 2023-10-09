@@ -83,7 +83,6 @@ class CartCheckout(BaseModel):
     payment: str
 
 # gold increases, potions decreate
-#NOTE: Check if you have enough
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
 
@@ -153,7 +152,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                 detail="Customer wants too much, don't have enough to sell"
             )
 
-            newPotions = curGreenPotions - quantity
+            newPotions = curBluePotions - quantity
             setBluePotions(newPotions)
 
             goldPayment = 50 * quantity
