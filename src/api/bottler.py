@@ -21,9 +21,6 @@ class PotionInventory(BaseModel):
 
 # Subtract the red mL I have, add red potions
 
-'''
-NOTE: CHECK IF YOU HAVE ENOUGH ML
-'''
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
@@ -39,6 +36,9 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             curRedml = getRedml()
 
             totalRedml = potions_delivered[i].quantity * 100
+
+            if totalRedml > curRedml:
+                break
 
             # How much potions can be created
             potionsCreate = totalRedml // 100
@@ -61,6 +61,9 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
             totalGreenml = potions_delivered[i].quantity * 100
 
+            if totalGreenml > curGreenml:
+                break
+
             # How much potions can be created
             potionsCreate = totalGreenml // 100
 
@@ -81,6 +84,9 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             curBlueml = getBlueml()
 
             totalBlueml = potions_delivered[i].quantity * 100
+
+            if totalBlueml > curBlueml:
+                break
 
             # How much potions can be created
             potionsCreate = totalBlueml // 100
