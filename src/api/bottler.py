@@ -21,7 +21,6 @@ class PotionInventory(BaseModel):
 
 # Subtract the red mL I have, add red potions
 
-
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 

@@ -113,7 +113,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             if quantity > curRedPotions:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Customer wants too much, don't have enough to sell"
+                detail="Customer wants too much, don't have enough to sell Red"
             )
 
             newPotions = curRedPotions - quantity
@@ -133,7 +133,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             if quantity > curGreenPotions:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Customer wants too much, don't have enough to sell"
+                detail="Customer wants too much, don't have enough to sell Green"
             )
 
             newPotions = curGreenPotions - quantity
@@ -153,7 +153,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             if quantity > curBluePotions:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Customer wants too much, don't have enough to sell"
+                detail="Customer wants too much, don't have enough to sell Blue"
             )
 
             newPotions = curBluePotions - quantity

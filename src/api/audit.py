@@ -14,7 +14,7 @@ router = APIRouter(
 @router.get("/inventory")
 def get_inventory():
 
-    totalPotions = getRedPotions() + getBluePotions() + getGreenPotions()
+    totalPotions = getRedPotions() + getGreenPotions() + getBluePotions()
     totalml = getRedml() + getBlueml() + getGreenml()
 
     return {"number_of_potions": totalPotions,
