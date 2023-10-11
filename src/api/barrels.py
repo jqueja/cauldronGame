@@ -64,12 +64,16 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 # how many small red barrles I can buy
 
 # Version 2: How much barrels I can buy in general
+
+#NOTE: Sort the Barrels buy the cheapest to get the most money
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     redCounter = 0
     greenCounter = 0
     blueCounter = 0
+
+    barrelPlan = []
 
 
     for i in range(len(wholesale_catalog)):
@@ -93,25 +97,29 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             if curBarrel.price <= curGold:
                 blueCounter += 1
 
-    totalCounter = redCounter + greenCounter + blueCounter
 
-    # We have items to sell! 
-    if totalCounter > 0:
-        return [
+    if redCounter > 0:
+        barrelPlan.append(
             {
                 "sku": "SMALL_RED_BARREL",
                 "quantity": redCounter,
-            },
+            }
+        )
+
+    elif greenCounter > 0:
+        barrelPlan.append(
             {
                 "sku": "SMALL_GREEN_BARREL",
                 "quantity": greenCounter,
-            },
+            }
+        )
+
+    elif blueCounter > 0:
+        barrelPlan.append(
             {
                 "sku": "SMALL_BLUE_BARREL",
                 "quantity": blueCounter,
-            },
-        ]
-    
-    # We have nothing to sell :(
-    else:
-        return []
+            }
+        )
+
+    return barrelPlan
