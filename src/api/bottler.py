@@ -144,29 +144,3 @@ def get_bottle_plan():
                 "quantity": blueCreate,
             },
         ]
-
-
-'''
-curRedml = getRedml()
-    print(f"Red ml before: {curRedml}")
-    print(f"potions before: {getRedPotions()}")
-
-
-
-    # How much potions can be created
-    potionsCreate = curRedml // 100
-
-    # Amount of how much to take out
-    subtractml = potionsCreate * 100
-
-    newml = curRedml - subtractml
-    setRedml(newml)
-
-    curPotions = getRedPotions()
-
-    # Take the current amount of potions and add the new ones
-    setRedPotions(curPotions + potionsCreate)
-
-    print(f"Red ml after: {getRedml()}")
-    print(f"potions after: {getRedPotions()}")
-'''

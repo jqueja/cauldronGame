@@ -69,6 +69,9 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
+
+    curGold = getGold()
+
     redCounter = 0
     greenCounter = 0
     blueCounter = 0
@@ -76,25 +79,30 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     barrelPlan = []
 
 
+
+
     for i in range(len(wholesale_catalog)):
-        curGold = getGold()
         curBarrel = wholesale_catalog[i]
 
         # Checking Red Barrels
         if curBarrel.sku == "SMALL_RED_BARREL":
             
             if curBarrel.price <= curGold:
+                curGold -= curBarrel.price
                 redCounter += 1
 
         # Checking Green 
         elif curBarrel.sku == "SMALL_GREEN_BARREL":
+
             if curBarrel.price <= curGold:
+                curGold -= curBarrel.price
                 greenCounter += 1
 
         # Checking Blue
         elif curBarrel.sku == "SMALL_BLUE_BARREl":
 
             if curBarrel.price <= curGold:
+                curGold -= curBarrel.price
                 blueCounter += 1
 
 
