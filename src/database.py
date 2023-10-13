@@ -14,7 +14,7 @@ engine = create_engine(database_connection_url(), pool_pre_ping=True)
 
 
 
-# RED POTIONS
+# RED POTIONS, CHANGE CHANGE CHAGNED
 def get_red_potions():
     #print("In the helper GET red potions")
 
@@ -30,6 +30,42 @@ def get_red_potions():
 
         return row.num_red_potions
     
+def get_green_ml():
+    #print("In the helper GET red mL")
+
+    query = """SELECT num_green_ml FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_green_ml
+    
+def get_blue_ml():
+    #print("In the helper GET red mL")
+
+    query = """SELECT num_blue_ml FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_blue_ml
+    
+def get_blue_ml():
+    #print("In the helper GET red mL")
+
+    query = """SELECT num_blue_ml FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_blue_ml
+    
+    
+
+'''
 def set_red_potions(num):
     #print("In the helper SET red potions")
 
@@ -89,16 +125,7 @@ def set_green_potions(num):
         
         return num
     
-def get_green_ml():
-    #print("In the helper GET red mL")
 
-    query = """SELECT num_green_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_green_ml
     
 def set_green_ml(num):
     #print("In the helper SET red potions")
@@ -136,17 +163,6 @@ def set_blue_potions(num):
         
         return num
     
-
-def get_blue_ml():
-    #print("In the helper GET red mL")
-
-    query = """SELECT num_blue_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_blue_ml
     
 def set_blue_ml(num):
     #print("In the helper SET red potions")
@@ -171,16 +187,16 @@ def get_dark_potions():
 
         return row.num_dark_potions
     
-def get_dark_ml():
+def get_blue_ml():
     #print("In the helper GET red mL")
 
-    query = """SELECT num_dark_ml FROM global_inventory"""
+    query = """SELECT num_blue_ml FROM global_inventory"""
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
         row = result.first()
 
-        return row.num_dark_ml
+        return row.num_blue_ml
     
 
 
@@ -209,9 +225,10 @@ def set_gold(num):
         
         return num
 
-'''
+
 NOTE: Future implementations for helper functions.
 
     1) Have one function that takes in PARAMS: (Potions type and set)
         - set_potion(type of potion,) GET/SET
+
 '''
