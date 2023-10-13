@@ -90,65 +90,91 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
+    print(wholesale_catalog)
+
 
     curGold = getGold()
 
-    redCounter = 0
-    greenCounter = 0
-    blueCounter = 0
+    red_counter = 0
+    green_counter = 0
+    blue_counter = 0
+    dark_counter = 0
 
     barrelPlan = []
 
 
-
-
     for i in range(len(wholesale_catalog)):
-        curBarrel = wholesale_catalog[i]
+        cur_barrel = wholesale_catalog[i]
+        print(cur_barrel)
+        print(curGold)
 
-        # Checking Red Barrels
-        if curBarrel.sku == "SMALL_RED_BARREL":
+        # Red Potion
+        if cur_barrel.potion_type == [1,0,0,0]:
+            print("Red")
             
-            if curBarrel.price <= curGold:
-                curGold -= curBarrel.price
-                redCounter += 1
+            if cur_barrel.price <= curGold:
+                print("Red Add")
+                curGold -= cur_barrel.price
+                red_counter += 1
 
-        # Checking Green 
-        elif curBarrel.sku == "SMALL_GREEN_BARREL":
+        # Green Potion
+        elif cur_barrel.potion_type == [0,1,0,0]:
 
-            if curBarrel.price <= curGold:
-                curGold -= curBarrel.price
-                greenCounter += 1
+            if cur_barrel.price <= curGold:
+                curGold -= cur_barrel.price
+                green_counter += 1
 
-        # Checking Blue
-        elif curBarrel.sku == "SMALL_BLUE_BARREl":
+        # Blue Potion
+        elif cur_barrel.potion_type == [0,0,1,0]:
 
-            if curBarrel.price <= curGold:
-                curGold -= curBarrel.price
-                blueCounter += 1
+            if cur_barrel.price <= curGold:
+                curGold -= cur_barrel.price
+                blue_counter += 1
+
+        # Dark Potion
+        elif cur_barrel.potion_type == [0,0,0,1]:
+            print("Dark")
+
+            if cur_barrel.price <= curGold:
+                print("Dark Add")
+                curGold -= cur_barrel.price
+                dark_counter += 1
+    print(f"Red: {red_counter}, Dark: {dark_counter}")
 
 
-    if redCounter > 0:
+    if red_counter > 0:
         barrelPlan.append(
             {
                 "sku": "SMALL_RED_BARREL",
-                "quantity": redCounter,
+                "quantity": red_counter,
             }
         )
 
-    elif greenCounter > 0:
+    if green_counter > 0:
         barrelPlan.append(
             {
                 "sku": "SMALL_GREEN_BARREL",
-                "quantity": greenCounter,
+                "quantity": green_counter,
             }
         )
 
-    elif blueCounter > 0:
+    if blue_counter > 0:
         barrelPlan.append(
             {
                 "sku": "SMALL_BLUE_BARREL",
-                "quantity": blueCounter,
+                "quantity": blue_counter,
             }
         )
+
+    if dark_counter > 0:
+        print("Why not here")
+        barrelPlan.append(
+            {
+                "sku": "SMALL_DARK_BARREL",
+                "quantity": dark_counter,
+            }
+        )
+
+    print(barrelPlan)
 
     return barrelPlan
