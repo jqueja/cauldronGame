@@ -18,7 +18,11 @@ engine = create_engine(database_connection_url(), pool_pre_ping=True)
 def get_red_potions():
     #print("In the helper GET red potions")
 
-    query = """SELECT num_red_potions FROM global_inventory"""
+    query = """
+    FROM global_inventory
+    Select quantity
+    WHERE sku = 'RED_POTION'
+    """
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))

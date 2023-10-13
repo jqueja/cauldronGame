@@ -153,7 +153,7 @@ def get_bottle_plan():
     dark_create = cur_dark_ml // 100
 
     bottle_plan = []
-
+    
     if red_create > 0:
         bottle_plan.append(
             {
@@ -185,96 +185,5 @@ def get_bottle_plan():
                 "quantity": dark_create,
             }
         )
-
+    
     return bottle_plan
-
-
-
-
-
-
-
-
-'''
-@router.post("/deliver")
-def post_deliver_bottles(potions_delivered: list[PotionInventory]):
-
-    for i in range(len(potions_delivered)):
-
-        curPotion = potions_delivered[i]
-        print(curPotion)
-        
-        # Red Potion
-        if curPotion.potion_type[0] == 100:
-
-            curRedml = getRedml()
-
-            totalRedml = potions_delivered[i].quantity * 100
-
-            if totalRedml > curRedml:
-                break
-
-            # How much potions can be created
-            potionsCreate = totalRedml // 100
-
-            # Amount of how much to take out
-            subtractml = potionsCreate * 100
-
-            newml = curRedml - subtractml
-            setRedml(newml)
-
-            curPotions = getRedPotions()
-
-            # Take the current amount of potions and add the new ones
-            setRedPotions(curPotions + potionsCreate)
-        
-        # Green Potion
-        if curPotion.potion_type[1] == 100:
-
-            curGreenml = getGreenml()
-
-            totalGreenml = potions_delivered[i].quantity * 100
-
-            if totalGreenml > curGreenml:
-                break
-
-            # How much potions can be created
-            potionsCreate = totalGreenml // 100
-
-            # Amount of how much to take out
-            subtractml = potionsCreate * 100
-
-            newml = curGreenml - subtractml
-            setGreenml(newml)
-
-            curPotions = getGreenPotions()
-
-            # Take the current amount of potions and add the new ones
-            setGreenPotions(curPotions + potionsCreate)
-
-        # Blue Potion
-        if curPotion.potion_type[2] == 100:
-
-            curBlueml = getBlueml()
-
-            totalBlueml = potions_delivered[i].quantity * 100
-
-            if totalBlueml > curBlueml:
-                break
-
-            # How much potions can be created
-            potionsCreate = totalBlueml // 100
-
-            # Amount of how much to take out
-            subtractml = potionsCreate * 100
-
-            newml = curBlueml - subtractml
-            setBlueml(newml)
-
-            curPotions = getBluePotions()
-
-            # Take the current amount of potions and add the new ones
-            setBluePotions(curPotions + potionsCreate)
-
-    return "ok"
-'''
