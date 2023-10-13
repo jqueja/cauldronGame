@@ -24,6 +24,7 @@ class PotionInventory(BaseModel):
 
 # [0, 0, 0, 0]
 
+
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
@@ -32,12 +33,12 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         cur_potion = potions_delivered[i]
         
         red_index = cur_potion.potion_type[0]
+        green_index = cur_potion.potion_type[1]
         
         # Red Potion
         if red_index != 0:
             
             cur_red_ml = get_red_ml()
-            
             
             total_red_ml = (cur_potion.quantity * red_index)
             print(total_red_ml)
@@ -52,46 +53,33 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             # Amount of how much to take out
             subtract_ml = potions_create * 100
 
-            #new_ml = cur_red_ml - subtract_ml
-            #set_red_ml(new_ml)
             red_ml_change(-1 * subtract_ml)
 
             red_potion_change(potions_create)
-
-            #cur_potions = get_red_potions()
-
-            # Take the current amount of potions and add the new ones
-            #set_red_potions(cur_potions + potions_create)
-            
         
         # Green Potion
-        if cur_potion.potion_type[1] != 0:
-            print("Green")
-
-
-            print(cur_potion.potion_type[1])
+        if green_index != 0:
+            print("Inside Green")
 
             cur_green_ml = get_green_ml()
+            
+            total_green_ml = (cur_potion.quantity * green_index)
+            print(total_green_ml)
 
-            total_green_ml = potions_delivered[i].quantity * 100
-            break
-
+            # Wants to take away to much ml
             if total_green_ml > cur_green_ml:
                 break
 
             # How much potions can be created
-            potions_create = total_green_ml // 100
+            potions_create = (total_green_ml) // 100
 
             # Amount of how much to take out
             subtract_ml = potions_create * 100
 
-            new_ml = cur_green_ml - subtract_ml
-            set_green_ml(new_ml)
+            green_ml_change(-1 * subtract_ml)
 
-            cur_potions = get_green_potions()
+            green_potion_change(potions_create)
 
-            # Take the current amount of potions and add the new ones
-            set_green_potions(cur_potions + potions_create)
 
         # Blue Potion
         if cur_potion.potion_type[2] != 0:
