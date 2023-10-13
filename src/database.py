@@ -30,6 +30,51 @@ def get_red_potions():
 
         return row.num_red_potions
     
+def get_green_potions():
+    #print("In the helper GET red potions")
+
+    query = """
+    FROM global_inventory
+    Select quantity
+    WHERE sku = 'GREEN_POTION'
+    """
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_green_potions
+    
+def get_blue_potions():
+    #print("In the helper GET red potions")
+
+    query = """
+    FROM global_inventory
+    Select quantity
+    WHERE sku = 'BLUE_POTION'
+    """
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_blue_potions
+    
+def get_dark_potions():
+    #print("In the helper GET red potions")
+
+    query = """
+    FROM global_inventory
+    Select quantity
+    WHERE sku = 'DARK_POTION'
+    """
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_dark_potions
+    
 def get_red_ml():
     #print("In the helper GET red mL")
 

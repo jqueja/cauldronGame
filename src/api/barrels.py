@@ -94,7 +94,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
 
 
-    curGold = get_gold
+    curGold = get_gold()
 
     red_counter = 0
     green_counter = 0

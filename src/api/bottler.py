@@ -24,102 +24,40 @@ class PotionInventory(BaseModel):
 
 # [0, 0, 0, 0]
 
+# Instead of checking whether or not I can make it into a potion right away.
+# What I can do is iterate through the diff indexes and add them together
+
+# Is there a more efficient way to bottle
 
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
-    for i in range(len(potions_delivered)):
+    for cur_potion in potions_delivered:
 
-        cur_potion = potions_delivered[i]
-        
         red_index = cur_potion.potion_type[0]
         green_index = cur_potion.potion_type[1]
         blue_index = cur_potion.potion_type[2]
         dark_index = cur_potion.potion_type[3]
-        
-        if red_index != 0:
+
+        with db.engine.begin() as connection:
+            connection.execute(
+            sqlalchemy.text(
+                """
+                UPDATE catalog
+                SET inventory = inventory + :quantity WHERE potion_type = :potion_type,
+                """),
+        [{"quantity": cur_potion.quantity, "potion_type": cur_potion.potion_type}])
             
-            cur_red_ml = get_red_ml()
-            
-            total_red_ml = (cur_potion.quantity * red_index)
-            print(total_red_ml)
-
-            # Wants to take away to much ml
-            if total_red_ml > cur_red_ml:
-                break
-
-            # How much potions can be created
-            potions_create = (total_red_ml) // 100
-
-            # Amount of how much to take out
-            subtract_ml = potions_create * 100
-
-            red_ml_change(-1 * subtract_ml)
-
-            red_potion_change(potions_create)
-        
-        if green_index != 0:
-
-            cur_green_ml = get_green_ml()
-            
-            total_green_ml = (cur_potion.quantity * green_index)
-            print(total_green_ml)
-
-            # Wants to take away to much ml
-            if total_green_ml > cur_green_ml:
-                break
-
-            # How much potions can be created
-            potions_create = (total_green_ml) // 100
-
-            # Amount of how much to take out
-            subtract_ml = potions_create * 100
-
-            green_ml_change(-1 * subtract_ml)
-
-            green_potion_change(potions_create)
-
-        if blue_index != 0:
-
-            cur_blue_ml = get_blue_ml()
-            
-            total_blue_ml = (cur_potion.quantity * blue_index)
-            print(total_blue_ml)
-
-            # Wants to take away to much ml
-            if total_blue_ml > cur_blue_ml:
-                break
-
-            # How much potions can be created
-            potions_create = (total_blue_ml) // 100
-
-            # Amount of how much to take out
-            subtract_ml = potions_create * 100
-
-            blue_ml_change(-1 * subtract_ml)
-
-            blue_potion_change(potions_create)
-
-        if dark_index != 0:
-
-            cur_dark_ml = get_dark_ml()
-            
-            total_dark_ml = (cur_potion.quantity * dark_index)
-            print(total_dark_ml)
-
-            # Wants to take away to much ml
-            if total_dark_ml > cur_dark_ml:
-                break
-
-            # How much potions can be created
-            potions_create = (total_dark_ml) // 100
-
-            # Amount of how much to take out
-            subtract_ml = potions_create * 100
-
-            dark_ml_change(-1 * subtract_ml)
-
-            dark_potion_change(potions_create)
+            connection.execute(
+            sqlalchemy.text(
+                """
+                UPDATE global_inventory
+                SET num_red_ml = num_red_ml + :red_index,
+                    num_green_ml = num_green_ml + :green_index,
+                    num_blue_ml = num_blue_ml + :blue_index,
+                    num_dark_ml = num_dark_ml + :dark_index
+                """),
+        [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index}])
 
     return "ok"
 
@@ -128,6 +66,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 # return potions type and quantity
 @router.post("/plan")
 def get_bottle_plan():
+    pass
     """
     Go from barrel to bottle.
     """
@@ -136,54 +75,27 @@ def get_bottle_plan():
     # green potion to add.
     # Expressed in integers from 1 to 100 that must sum up to 100.
 
-    # Initial logic: bottle all barrels into red potions.
-
-    # INCREASED Red Potions
-    # DECREASED Red ml
-
+    '''
     cur_red_ml = get_red_ml()
     cur_green_ml = get_green_ml()
     cur_blue_ml = get_blue_ml()
     cur_dark_ml = get_dark_ml()
 
-    # How much potions can be created
-    red_create = cur_red_ml // 100
-    green_create = cur_green_ml // 100
-    blue_create = cur_blue_ml // 100
-    dark_create = cur_dark_ml // 100
+    with db.engine.begin() as connection:
+            connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT sku, name 
+                FROM catalog
+                WHERE inventory = 0
+                
+                """),
+        [{}])
 
-    bottle_plan = []
-    
-    if red_create > 0:
-        bottle_plan.append(
-            {
-                "potion_type": [100, 0, 0, 0],
-                "quantity": red_create,
-            }
-        )
-    
-    if green_create > 0:
-        bottle_plan.append(
-            {
-                "potion_type": [0, 100, 0, 0],
-                "quantity": green_create,
-            },
-        )
+    SELECT * FROM potions
 
-    if blue_create > 0:
-        bottle_plan.append(
-            {
-                "potion_type": [0, 0, 100, 0],
-                "quantity": blue_create,
-            }
-        )
+    for potion in potions:
+        potion.
 
-    if dark_create > 0:
-        bottle_plan.append(
-            {
-                "potion_type": [0, 0, 0, 100],
-                "quantity": dark_create,
-            }
-        )
-    
     return bottle_plan
+'''
