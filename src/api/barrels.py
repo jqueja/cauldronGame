@@ -105,8 +105,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
     for i in range(len(wholesale_catalog)):
         cur_barrel = wholesale_catalog[i]
-        print(cur_barrel)
-        print(curGold)
 
         # Red Potion
         if cur_barrel.potion_type == [1,0,0,0]:
@@ -139,7 +137,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 print("Dark Add")
                 curGold -= cur_barrel.price
                 dark_counter += 1
-    print(f"Red: {red_counter}, Dark: {dark_counter}")
 
 
     if red_counter > 0:
@@ -175,6 +172,6 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             }
         )
 
-    print(barrelPlan)
+    #print(barrelPlan)
 
     return barrelPlan
