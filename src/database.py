@@ -30,6 +30,17 @@ def get_red_potions():
 
         return row.num_red_potions
     
+def get_red_ml():
+    #print("In the helper GET red mL")
+
+    query = """SELECT num_red_ml FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_red_ml
+    
 def get_green_ml():
     #print("In the helper GET red mL")
 
@@ -63,8 +74,17 @@ def get_blue_ml():
 
         return row.num_blue_ml
     
-    
+def get_dark_ml():
+    #print("In the helper GET red mL")
 
+    query = """SELECT num_dark_ml FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.num_dark_ml
+    
 '''
 def set_red_potions(num):
     #print("In the helper SET red potions")
@@ -78,16 +98,6 @@ def set_red_potions(num):
         
         return num
     
-def get_red_ml():
-    #print("In the helper GET red mL")
-
-    query = """SELECT num_red_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_red_ml
     
 def set_red_ml(num):
     #print("In the helper SET red potions")
