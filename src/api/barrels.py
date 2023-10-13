@@ -30,34 +30,55 @@ NOTE: Can we trust the call? Do we have to check for potion type as well?
 '''
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
-    """ """
 
-    for i in range(len(barrels_delivered)):
-        curGold = getGold()
-        curBarrel = barrels_delivered[i]
+    print(barrels_delivered)
 
-        print(curBarrel)
+    gold_paid = 0
+    red_ml = 0
+    blue_ml = 0
+    green_ml = 0
+    dark_ml = 0
 
-        # Only buy red barrels
-        #if curBarrel.sku == "SMALL_RED_BARREL":
+    for barrel_delivered in barrels_delivered:
+        gold_paid += barrel_delivered.price * barrel_delivered.quantity
+
+        # Red Potion
+        if barrel_delivered.potion_type == [1,0,0,0]:
+            red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Green Potion
+        elif barrel_delivered.potion_type == [0, 1, 0, 0]:
+            green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Blue Potion
+        elif barrel_delivered.potion_type == [0, 0, 1, 0]:
+            blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Dark Potion
+        elif barrel_delivered.potion_type == [0, 0, 0, 1]:
+            dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        else:
+            raise Exception("Invalid potion type")
         
-        # Buy all the barrels we can
-        if curBarrel.price <= curGold:
+    print(f"gold_paid: {gold_paid}, red_ml: {red_ml}, blue_ml: {blue_ml}, dark_ml: {dark_ml}")
 
-            if curBarrel.sku == "SMALL_RED_BARREL":
-                setRedml(getRedml() + curBarrel.ml_per_barrel)
-                setGold(curGold - curBarrel.price)
-
-            elif curBarrel.sku == "SMALL_GREEN_BARREL":
-                setGreenml(getGreenml() + curBarrel.ml_per_barrel)
-                setGold(curGold - curBarrel.price)
-
-            elif  curBarrel.sku == "SMALL_BLUE_BARREL":
-                setBlueml(getBlueml() + curBarrel.ml_per_barrel)
-                setGold(curGold - curBarrel.price)
-
+    with db.engine.begin() as connection:
+        connection.execute(
+            sqlalchemy.text(
+                """
+                UPDATE global_inventory SET
+                num_red_ml = num_red_ml + :red_ml,
+                num_green_ml = num_green_ml + :green_ml,
+                num_blue_ml = num_blue_ml + :blue_ml,
+                num_dark_ml = num_dark_ml + :dark_ml,
+                gold = gold - :gold_paid
+                """),
+        [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml, "gold_paid": gold_paid}])
 
     return "ok"
+
+
 
 # Gets called once a day
 # see how much gold and see what I can purchase
