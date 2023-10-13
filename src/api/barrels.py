@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from src.api import auth
 
 from ..database import *
+from ..helper import *
 
 
 router = APIRouter(
@@ -93,7 +94,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(wholesale_catalog)
 
 
-    curGold = getGold()
+    curGold = get_gold
 
     red_counter = 0
     green_counter = 0
@@ -106,7 +107,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     for i in range(len(wholesale_catalog)):
         cur_barrel = wholesale_catalog[i]
 
-        # Red Potion
+        # Red Barrel
         if cur_barrel.potion_type == [1,0,0,0]:
             print("Red")
             
@@ -115,21 +116,21 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 curGold -= cur_barrel.price
                 red_counter += 1
 
-        # Green Potion
+        # Green Barrel
         elif cur_barrel.potion_type == [0,1,0,0]:
 
             if cur_barrel.price <= curGold:
                 curGold -= cur_barrel.price
                 green_counter += 1
 
-        # Blue Potion
+        # Blue Barrel
         elif cur_barrel.potion_type == [0,0,1,0]:
 
             if cur_barrel.price <= curGold:
                 curGold -= cur_barrel.price
                 blue_counter += 1
 
-        # Dark Potion
+        # Dark Barrel
         elif cur_barrel.potion_type == [0,0,0,1]:
             print("Dark")
 
@@ -172,6 +173,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             }
         )
 
+    
     #print(barrelPlan)
 
     return barrelPlan

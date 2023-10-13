@@ -15,7 +15,7 @@ engine = create_engine(database_connection_url(), pool_pre_ping=True)
 
 
 # RED POTIONS
-def getRedPotions():
+def get_red_potions():
     #print("In the helper GET red potions")
 
     query = """SELECT num_red_potions FROM global_inventory"""
@@ -26,7 +26,7 @@ def getRedPotions():
 
         return row.num_red_potions
     
-def setRedPotions(num):
+def set_red_potions(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -38,7 +38,7 @@ def setRedPotions(num):
         
         return num
     
-def getRedml():
+def get_red_ml():
     #print("In the helper GET red mL")
 
     query = """SELECT num_red_ml FROM global_inventory"""
@@ -49,7 +49,7 @@ def getRedml():
 
         return row.num_red_ml
     
-def setRedml(num):
+def set_red_ml(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -60,12 +60,9 @@ def setRedml(num):
         result = connection.execute(sqlalchemy.text(query))
         
         return num
-    
-
-
 
 # GREEN POTIONS
-def getGreenPotions():
+def get_green_potions():
     #print("In the helper GET red potions")
 
     query = """SELECT num_green_potions FROM global_inventory"""
@@ -76,7 +73,7 @@ def getGreenPotions():
 
         return row.num_green_potions
     
-def setGreenPotions(num):
+def set_green_potions(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -88,7 +85,7 @@ def setGreenPotions(num):
         
         return num
     
-def getGreenml():
+def get_green_ml():
     #print("In the helper GET red mL")
 
     query = """SELECT num_green_ml FROM global_inventory"""
@@ -99,7 +96,7 @@ def getGreenml():
 
         return row.num_green_ml
     
-def setGreenml(num):
+def set_green_ml(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -110,15 +107,9 @@ def setGreenml(num):
         result = connection.execute(sqlalchemy.text(query))
         
         return num
-    
-
-
-
-
-
 
 # BLUE POTIONS
-def getBluePotions():
+def get_blue_potions():
     #print("In the helper GET blue potions")
 
     query = """SELECT num_blue_potions FROM global_inventory"""
@@ -129,7 +120,7 @@ def getBluePotions():
 
         return row.num_blue_potions
     
-def setBluePotions(num):
+def set_blue_potions(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -142,7 +133,7 @@ def setBluePotions(num):
         return num
     
 
-def getBlueml():
+def get_blue_ml():
     #print("In the helper GET red mL")
 
     query = """SELECT num_blue_ml FROM global_inventory"""
@@ -153,7 +144,7 @@ def getBlueml():
 
         return row.num_blue_ml
     
-def setBlueml(num):
+def set_blue_ml(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -164,20 +155,34 @@ def setBlueml(num):
         result = connection.execute(sqlalchemy.text(query))
         
         return num
+    
+def get_dark_potions():
+    #print("In the helper GET red potions")
 
+    query = """SELECT num_dark_potions FROM global_inventory"""
 
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
 
+        return row.num_dark_potions
+    
+def get_dark_ml():
+    #print("In the helper GET red mL")
 
+    query = """SELECT num_dark_ml FROM global_inventory"""
 
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
 
+        return row.num_dark_ml
     
 
-        
 
-    
 
 # GOLD STUFF
-def getGold():
+def get_gold():
     #print("In the helper GET gold")
 
     query = """SELECT gold FROM global_inventory"""
@@ -188,7 +193,7 @@ def getGold():
 
         return row.gold
     
-def setGold(num):
+def set_gold(num):
     #print("In the helper SET red potions")
 
     query = f"""
@@ -200,10 +205,9 @@ def setGold(num):
         
         return num
 
-
 '''
 NOTE: Future implementations for helper functions.
 
     1) Have one function that takes in PARAMS: (Potions type and set)
-        - setPotion(type of potion,) GET/SET
+        - set_potion(type of potion,) GET/SET
 '''

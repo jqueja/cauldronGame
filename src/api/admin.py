@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from src.api import auth
 
 from ..database import *
-from .carts import dctCart
 
 
 router = APIRouter(
@@ -19,13 +18,14 @@ def reset():
     inventory, and all barrels are removed from inventory. Carts are all reset.
     """
 
-    setRedPotions(0)
-    setGreenPotions(0)
-    setBluePotions(0)
-    setRedml(0)
-    setGreenml(0)
-    setBlueml(0)
-    setGold(100)
+    set_red_potions(0)
+    set_green_potions(0)
+    set_blue_potions(0)
+    set_red_ml(0)
+    set_green_ml(0)
+    set_blue_ml(0)
+    set_gold(100)
+
 
     # clears the global dct
 

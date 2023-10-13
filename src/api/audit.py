@@ -14,13 +14,14 @@ router = APIRouter(
 @router.get("/inventory")
 def get_inventory():
 
-    totalPotions = getRedPotions() + getGreenPotions() + getBluePotions()
-    totalml = getRedml() + getBlueml() + getGreenml()
+    total_potions = get_red_potions() + get_green_potions() + get_blue_potions() + get_dark_potions()
+    total_ml = get_red_ml() + get_blue_ml() + get_green_ml() + get_dark_ml()
 
-    return {"number_of_potions": totalPotions,
-            "ml_in_barrels": totalml,
-            "gold": getGold()
-            }
+    return {"number_of_potions": total_potions,
+        "ml_in_barrels": total_ml,
+        "gold": get_gold()
+        }
+
 
 class Result(BaseModel):
     gold_match: bool

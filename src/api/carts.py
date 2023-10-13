@@ -7,20 +7,16 @@ from src import database as db
 
 from ..database import *
 
-
-# Added the HTTPException and status
-
 router = APIRouter(
     prefix="/carts",
     tags=["cart"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
-dctCart = {}
+cart_dict = {}
 
 class NewCart(BaseModel):
     customer: str
-
 
 cart_id = 0
 
@@ -36,136 +32,114 @@ def create_cart(new_cart: NewCart):
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
 
-    global dctCart
+    global cart_dict
 
-    print(dctCart)
+    print(cart_dict)
     
-    cartInfo = dctCart[cart_id]
-    itemSku = cartInfo[0]
-    quantItem = cartInfo[1]
+    cart_info = cart_dict[cart_id]
+    item_sku = cart_info[0]
+    quant_item = cart_info[1]
 
-    resultString = f"{itemSku}: {quantItem}"
-    print(resultString)
+    result_string = f"{item_sku}: {quant_item}"
+    print(result_string)
     
-    #return "ok"
-    return resultString
+    return result_string
 
 class CartItem(BaseModel):
     quantity: int
 
-
-# Use a python dct
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
-
     
-    global dctCart
+    global cart_dict
 
     # If the customer already exists, update the value
-    if cart_id in dctCart:
-        info = dctCart[cart_id]
+    if cart_id in cart_dict:
+        info = cart_dict[cart_id]
         info[1] = cart_item.quantity
         
-
     # The customer is new, so make a cart for them
-    dctCart[cart_id] = [item_sku, cart_item.quantity]
+    cart_dict[cart_id] = [item_sku, cart_item.quantity]
 
-    print(dctCart)
+    print(cart_dict)
     
-    '''
-    print(cart_id)
-    print(item_sku)
-    print(cart_item.quantity)
-
-    #insertOrder(cart_id, item_sku, cart_item.quantity)
-    '''
-
     return "OK"
-
 
 class CartCheckout(BaseModel):
     payment: str
 
-# gold increases, potions decreate
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
 
-    print(dctCart)
+    print(cart_dict)
 
+    cart_info = cart_dict[cart_id]
 
-    cartInfo = dctCart[cart_id]
-
-    print(cartInfo[0])
-    print(cartInfo[1])
+    print(cart_info[0])
+    print(cart_info[1])
  
     # The cart exists
-    if cartInfo:
-        sku = cartInfo[0]
-        quantity = cartInfo[1]
+    if cart_info:
+        sku = cart_info[0]
+        quantity = cart_info[1]
 
         # Check if we have enough, if we do sell
-    
-        # Assuming that they want Red Potions
-        if sku == "RED_POTION" :
+        if sku == "RED_POTION":
+            cur_red_potions = get_red_potions()
 
-            curRedPotions = getRedPotions()
-
-            if quantity > curRedPotions:
+            if quantity > cur_red_potions:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Customer wants too much, don't have enough to sell Red"
             )
 
-            newPotions = curRedPotions - quantity
-            setRedPotions(newPotions)
+            new_potions = cur_red_potions - quantity
+            set_red_potions(new_potions)
 
-            goldPayment = 50 * quantity
+            gold_payment = 50 * quantity
 
-            goldAmount = getGold() + goldPayment
-            setGold(goldAmount)
+            gold_amount = get_gold() + gold_payment
+            set_gold(gold_amount)
 
-            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
+            return {"total_potions_bought": quantity, "total_gold_paid": gold_payment}
         
         elif sku == "GREEN_POTION":
+            cur_green_potions = get_green_potions()
 
-            curGreenPotions = getGreenPotions()
-
-            if quantity > curGreenPotions:
+            if quantity > cur_green_potions:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Customer wants too much, don't have enough to sell Green"
             )
 
-            newPotions = curGreenPotions - quantity
-            setGreenPotions(newPotions)
+            new_potions = cur_green_potions - quantity
+            set_green_potions(new_potions)
 
-            goldPayment = 50 * quantity
+            gold_payment = 50 * quantity
 
-            goldAmount = getGold() + goldPayment
-            setGold(goldAmount)
+            gold_amount = get_gold() + gold_payment
+            set_gold(gold_amount)
 
-            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
+            return {"total_potions_bought": quantity, "total_gold_paid": gold_payment}
         
         elif sku == "BLUE_POTION":
+            cur_blue_potions = get_blue_potions()
 
-            curBluePotions = getBluePotions()
-
-            if quantity > curBluePotions:
+            if quantity > cur_blue_potions:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Customer wants too much, don't have enough to sell Blue"
             )
 
-            newPotions = curBluePotions - quantity
-            setBluePotions(newPotions)
+            new_potions = cur_blue_potions - quantity
+            set_blue_potions(new_potions)
 
-            goldPayment = 50 * quantity
+            gold_payment = 50 * quantity
 
-            goldAmount = getGold() + goldPayment
-            setGold(goldAmount)
+            gold_amount = get_gold() + gold_payment
+            set_gold(gold_amount)
 
-            return {"total_potions_bought": quantity, "total_gold_paid": goldPayment}
-
+            return {"total_potions_bought": quantity, "total_gold_paid": gold_payment}
 
     # Item does not exist, send HTTP Error
     else:
@@ -173,4 +147,3 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="cart_id does not exist, cart not created"
         )
-    
