@@ -34,8 +34,9 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         
         red_index = cur_potion.potion_type[0]
         green_index = cur_potion.potion_type[1]
+        blue_index = cur_potion.potion_type[2]
+        dark_index = cur_potion.potion_type[3]
         
-        # Red Potion
         if red_index != 0:
             
             cur_red_ml = get_red_ml()
@@ -57,9 +58,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
             red_potion_change(potions_create)
         
-        # Green Potion
         if green_index != 0:
-            print("Inside Green")
 
             cur_green_ml = get_green_ml()
             
@@ -80,30 +79,47 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
             green_potion_change(potions_create)
 
-
-        # Blue Potion
-        if cur_potion.potion_type[2] != 0:
+        if blue_index != 0:
 
             cur_blue_ml = get_blue_ml()
+            
+            total_blue_ml = (cur_potion.quantity * blue_index)
+            print(total_blue_ml)
 
-            total_blue_ml = potions_delivered[i].quantity * 100
-
+            # Wants to take away to much ml
             if total_blue_ml > cur_blue_ml:
                 break
 
             # How much potions can be created
-            potions_create = total_blue_ml // 100
+            potions_create = (total_blue_ml) // 100
 
             # Amount of how much to take out
             subtract_ml = potions_create * 100
 
-            new_ml = cur_blue_ml - subtract_ml
-            set_blue_ml(new_ml)
+            blue_ml_change(-1 * subtract_ml)
 
-            cur_potions = get_blue_potions()
+            blue_potion_change(potions_create)
 
-            # Take the current amount of potions and add the new ones
-            set_blue_potions(cur_potions + potions_create)
+        if dark_index != 0:
+
+            cur_dark_ml = get_dark_ml()
+            
+            total_dark_ml = (cur_potion.quantity * dark_index)
+            print(total_dark_ml)
+
+            # Wants to take away to much ml
+            if total_dark_ml > cur_dark_ml:
+                break
+
+            # How much potions can be created
+            potions_create = (total_dark_ml) // 100
+
+            # Amount of how much to take out
+            subtract_ml = potions_create * 100
+
+            dark_ml_change(-1 * subtract_ml)
+
+            dark_potion_change(potions_create)
 
     return "ok"
 
