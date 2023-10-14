@@ -130,6 +130,17 @@ def get_dark_ml():
 
         return row.num_dark_ml
     
+def get_gold():
+    #print("In the helper GET gold")
+
+    query = """SELECT gold FROM global_inventory"""
+
+    with db.engine.begin() as connection:
+        result = connection.execute(sqlalchemy.text(query))
+        row = result.first()
+
+        return row.gold
+    
 '''
 def set_red_potions(num):
     #print("In the helper SET red potions")
@@ -257,16 +268,6 @@ def get_blue_ml():
 
 
 # GOLD STUFF
-def get_gold():
-    #print("In the helper GET gold")
-
-    query = """SELECT gold FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.gold
     
 def set_gold(num):
     #print("In the helper SET red potions")

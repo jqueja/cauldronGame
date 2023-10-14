@@ -44,7 +44,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             sqlalchemy.text(
                 """
                 UPDATE catalog
-                SET inventory = inventory + :quantity WHERE potion_type = :potion_type,
+                SET inventory = inventory + :quantity WHERE potion_type = :potion_type
                 """),
         [{"quantity": cur_potion.quantity, "potion_type": cur_potion.potion_type}])
             
@@ -52,12 +52,12 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             sqlalchemy.text(
                 """
                 UPDATE global_inventory
-                SET num_red_ml = num_red_ml + :red_index,
-                    num_green_ml = num_green_ml + :green_index,
-                    num_blue_ml = num_blue_ml + :blue_index,
-                    num_dark_ml = num_dark_ml + :dark_index
+                SET num_red_ml = num_red_ml - :red_index * :quantity,
+                    num_green_ml = num_green_ml - :green_index * quantity,
+                    num_blue_ml = num_blue_ml - :blue_index * quantity,
+                    num_dark_ml = num_dark_ml - :dark_index * quantity
                 """),
-        [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index}])
+        [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index, "quantity": cur_potion.quantity}])
 
     return "ok"
 
@@ -66,36 +66,55 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 # return potions type and quantity
 @router.post("/plan")
 def get_bottle_plan():
-    pass
-    """
-    Go from barrel to bottle.
-    """
-
-    # Each bottle has a quantity of what proportion of red, blue, and
-    # green potion to add.
-    # Expressed in integers from 1 to 100 that must sum up to 100.
-
-    '''
-    cur_red_ml = get_red_ml()
-    cur_green_ml = get_green_ml()
-    cur_blue_ml = get_blue_ml()
-    cur_dark_ml = get_dark_ml()
 
     with db.engine.begin() as connection:
-            connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT sku, name 
-                FROM catalog
-                WHERE inventory = 0
-                
-                """),
-        [{}])
+        empty_potions = connection.execute(
+        sqlalchemy.text(
+            """
+            SELECT name, potion_type, inventory
+            FROM catalog
+            WHERE inventory = 0
+            """)
+        )
 
-    SELECT * FROM potions
+        bottle_lst = []
 
-    for potion in potions:
-        potion.
+        potion_lst = empty_potions.fetchall()
 
-    return bottle_plan
-'''
+        cur_red_ml = get_red_ml()
+        cur_green_ml = get_green_ml()
+        cur_blue_ml = get_blue_ml()
+        cur_dark_ml = get_dark_ml()
+
+        for cur_potion in potion_lst:
+            red_index = cur_potion.potion_type[0]
+            green_index = cur_potion.potion_type[1]
+            blue_index = cur_potion.potion_type[2]
+            dark_index = cur_potion.potion_type[3]
+
+            if (red_index <= cur_red_ml) and (green_index <= cur_green_ml) and \
+            (blue_index <= cur_blue_ml) and (dark_index <= cur_dark_ml):
+                cur_red_ml  -= red_index
+                cur_green_ml -= green_index
+                cur_blue_ml -= blue_index
+                cur_dark_ml -= dark_index
+
+                bottle_lst.append(
+                    {
+                    "potion_type": cur_potion.potion_type,
+                    "quantity": 1,
+                    }
+                )
+
+        #print(potion_lst)
+
+    return "ok"
+
+    
+    '''
+     bottle_plan.append(
+            {
+                "potion_type": [100, 0, 0, 0],
+                "quantity": red_create,
+            }
+    '''
