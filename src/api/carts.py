@@ -199,4 +199,5 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                 detail=f"Customer wants too much, don't have enough to sell {catalog_name}"
             )
         
+        
     return "ok"
