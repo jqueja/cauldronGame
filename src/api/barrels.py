@@ -117,21 +117,22 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                 red_counter += 1
 
         # Green Barrel
-        elif cur_barrel.potion_type == [0,1,0,0]:
+        if cur_barrel.potion_type == [0,1,0,0]:
+
 
             if cur_barrel.price <= curGold:
                 curGold -= cur_barrel.price
                 green_counter += 1
 
         # Blue Barrel
-        elif cur_barrel.potion_type == [0,0,1,0]:
+        if cur_barrel.potion_type == [0,0,1,0]:
 
             if cur_barrel.price <= curGold:
                 curGold -= cur_barrel.price
                 blue_counter += 1
 
         # Dark Barrel
-        elif cur_barrel.potion_type == [0,0,0,1]:
+        if cur_barrel.potion_type == [0,0,0,1]:
             print("Dark")
 
             if cur_barrel.price <= curGold:
