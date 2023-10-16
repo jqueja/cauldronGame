@@ -77,7 +77,7 @@ def get_bottle_plan():
             """)
         )
 
-        bottle_lst = []
+        bottle_plan = []
 
         potion_lst = empty_potions.fetchall()
 
@@ -99,7 +99,7 @@ def get_bottle_plan():
                 cur_blue_ml -= blue_index
                 cur_dark_ml -= dark_index
 
-                bottle_lst.append(
+                bottle_plan.append(
                     {
                     "potion_type": cur_potion.potion_type,
                     "quantity": 1,
@@ -108,13 +108,4 @@ def get_bottle_plan():
 
         #print(potion_lst)
 
-    return "ok"
-
-    
-    '''
-     bottle_plan.append(
-            {
-                "potion_type": [100, 0, 0, 0],
-                "quantity": red_create,
-            }
-    '''
+    return bottle_plan
