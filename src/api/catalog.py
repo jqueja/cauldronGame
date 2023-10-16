@@ -28,6 +28,9 @@ def get_catalog():
 
     for potion in result_lst:
 
+        if len(potion_catalog) == 6:
+            break
+
         potion_catalog.append(
         {
                 "sku": potion.sku,
