@@ -64,8 +64,8 @@ def get_dark_potions():
     #print("In the helper GET red potions")
 
     query = """
-    FROM global_inventory
     Select quantity
+    FROM global_inventory
     WHERE sku = 'DARK_POTION'
     """
 
