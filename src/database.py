@@ -19,8 +19,8 @@ def get_red_potions():
     #print("In the helper GET red potions")
 
     query = """
-    Select quantity
-    FROM global_inventory
+    Select inventory
+    FROM catalog
     WHERE sku = 'RED_POTION'
     """
 
@@ -34,8 +34,8 @@ def get_green_potions():
     #print("In the helper GET red potions")
 
     query = """
-    Select quantity
-    FROM global_inventory
+    Select inventory
+    FROM catalog
     WHERE sku = 'GREEN_POTION'
     """
 
@@ -49,8 +49,8 @@ def get_blue_potions():
     #print("In the helper GET red potions")
 
     query = """
-    Select quantity
-    FROM global_inventory
+    Select inventory
+    FROM catalog
     WHERE sku = 'BLUE_POTION'
     """
 
@@ -64,8 +64,8 @@ def get_dark_potions():
     #print("In the helper GET red potions")
 
     query = """
-    Select quantity
-    FROM global_inventory
+    Select inventory
+    FROM catalog
     WHERE sku = 'DARK_POTION'
     """
 
