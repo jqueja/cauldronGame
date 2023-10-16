@@ -53,10 +53,13 @@ def get_cart(cart_id: int):
         )
 
         result_cart = result.fetchall()
-        
-        catalog_id = result_cart[0][0]
-        quantity = result_cart[0][1]
 
+        if not result_cart:
+            raise HTTPException(status_code=404, detail=f"Cart with ID {cart_id} not found")
+        
+        row = result_cart[0]
+        catalog_id = row.catalog
+        quantity = row.quantity
 
     with db.engine.begin() as connection:
         catalog_result = connection.execute(
@@ -79,9 +82,6 @@ def get_cart(cart_id: int):
             "quantity": quantity
             }
         ] 
-
-
-    
 
 class CartItem(BaseModel):
     quantity: int
@@ -124,83 +124,79 @@ class CartCheckout(BaseModel):
 
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
-    pass
 
-    '''
-    print(cart_dict)
+    # Getting data from cart, 
+    with db.engine.begin() as connection:
+        result = connection.execute(
+        sqlalchemy.text(
+            """
+            SELECT catalog, quantity
+            FROM cart
+            WHERE id = :cart_id
+            """),
+        [{"cart_id": cart_id}])
 
-    cart_info = cart_dict[cart_id]
+        result_cart = result.fetchall()
 
-    print(cart_info[0])
-    print(cart_info[1])
- 
-    # The cart exists
-    if cart_info:
-        sku = cart_info[0]
-        quantity = cart_info[1]
-
-        # Check if we have enough, if we do sell
-        if sku == "RED_POTION":
-            cur_red_potions = get_red_potions()
-
-            if quantity > cur_red_potions:
-                raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Customer wants too much, don't have enough to sell Red"
-            )
-
-            new_potions = cur_red_potions - quantity
-            set_red_potions(new_potions)
-
-            gold_payment = 50 * quantity
-
-            gold_amount = get_gold() + gold_payment
-            set_gold(gold_amount)
-
-            return {"total_potions_bought": quantity, "total_gold_paid": gold_payment}
+        if not result_cart:
+            raise HTTPException(status_code=404, detail=f"Cart with ID {cart_id} not found")
         
-        elif sku == "GREEN_POTION":
-            cur_green_potions = get_green_potions()
+        row = result_cart[0]
+        cart_catalog_id = row.catalog
+        cart_quantity = row.quantity
 
-            if quantity > cur_green_potions:
-                raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Customer wants too much, don't have enough to sell Green"
-            )
 
-            new_potions = cur_green_potions - quantity
-            set_green_potions(new_potions)
+    
+    # Grabbing data from the catalog
+    with db.engine.begin() as connection:
+        result = connection.execute(
+        sqlalchemy.text(
+            """
+            SELECT *
+            FROM catalog
+            WHERE id = :catalog_id
+            """),
+        [{"catalog_id": cart_catalog_id}])
 
-            gold_payment = 50 * quantity
-
-            gold_amount = get_gold() + gold_payment
-            set_gold(gold_amount)
-
-            return {"total_potions_bought": quantity, "total_gold_paid": gold_payment}
+        result_catalog = result.fetchall()
         
-        elif sku == "BLUE_POTION":
-            cur_blue_potions = get_blue_potions()
+        row = result_catalog[0]
+        catalog_id = row.id
+        catalog_price = row.price
+        catalog_potion_type = row.potion_type
+        catalog_inventory = row.inventory
+        catalog_name = row.name
 
-            if quantity > cur_blue_potions:
-                raise HTTPException(
+        
+        # The customer is asking the right amount, updates catalog
+        if cart_quantity <= catalog_inventory:
+            print("Inside here")
+
+            with db.engine.begin() as connection:
+                result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    UPDATE catalog
+                    SET inventory = inventory - :cart_quantity
+                    WHERE potion_type = :catalog_potion_type
+                    """),
+                [{"catalog_potion_type": catalog_potion_type, "cart_quantity": cart_quantity}])
+
+            # Updating global inventory
+            with db.engine.begin() as connection:
+                result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    UPDATE global_inventory
+                    SET gold = gold + :cart_quantity * :catalog_price
+                    """),
+                [{"cart_quantity": cart_quantity, "catalog_price": catalog_price}])
+
+
+        else:
+            raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Customer wants too much, don't have enough to sell Blue"
+                detail=f"Customer wants too much, don't have enough to sell {catalog_name}"
             )
-
-            new_potions = cur_blue_potions - quantity
-            set_blue_potions(new_potions)
-
-            gold_payment = 50 * quantity
-
-            gold_amount = get_gold() + gold_payment
-            set_gold(gold_amount)
-
-            return {"total_potions_bought": quantity, "total_gold_paid": gold_payment}
-
-    # Item does not exist, send HTTP Error
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="cart_id does not exist, cart not created"
-        )
-    '''
+        
+    return "ok"
