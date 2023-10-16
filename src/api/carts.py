@@ -13,64 +13,120 @@ router = APIRouter(
     dependencies=[Depends(auth.get_api_key)],
 )
 
-cart_dict = {}
+#cart_dict = {}
 
 class NewCart(BaseModel):
     customer: str
 
-cart_id = 0
+#cart_id = 0
 
 @router.post("/")
 def create_cart(new_cart: NewCart):
-    """ """
-    print("Created new Cart")
-    global cart_id
+    with db.engine.begin() as connection:
+        result = connection.execute(
+        sqlalchemy.text(
+            """
+            INSERT INTO cart
+            DEFAULT VALUES
+            RETURNING id;
+            """)
+        )
 
-    cart_id += 1
-    return {"cart_id": cart_id}
+    id_call = result.scalar()
+    print(id_call)
 
+    return id_call
+    
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT catalog, quantity
+                FROM cart
+                LEFT JOIN catalog ON cart.id = catalog.id
+                WHERE cart.id = :cart_id
+                """
+            ),
+            {"cart_id": cart_id}
+        )
 
-    global cart_dict
+        result_cart = result.fetchall()
+        
+        catalog_id = result_cart[0][0]
+        quantity = result_cart[0][1]
 
-    print(cart_dict)
+
+    with db.engine.begin() as connection:
+        catalog_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT name
+                FROM catalog
+                WHERE id = :catalog_id
+                """
+            ),
+            {"catalog_id": catalog_id}
+        )
+
+        # Gets the potion name
+        content = catalog_result.scalar()
+        
+        return [
+            {
+            "catalog_name": content,
+            "quantity": quantity
+            }
+        ] 
+
+
     
-    cart_info = cart_dict[cart_id]
-    item_sku = cart_info[0]
-    quant_item = cart_info[1]
-
-    result_string = f"{item_sku}: {quant_item}"
-    print(result_string)
-    
-    return result_string
 
 class CartItem(BaseModel):
     quantity: int
 
 @router.post("/{cart_id}/items/{item_sku}")
 def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
-    
-    global cart_dict
 
-    # If the customer already exists, update the value
-    if cart_id in cart_dict:
-        info = cart_dict[cart_id]
-        info[1] = cart_item.quantity
+    with db.engine.begin() as connection:
+        result = connection.execute(
+        sqlalchemy.text(
+            """
+            SELECT id
+            FROM catalog
+            WHERE sku = :item_sku
+            """),
+        [{"item_sku": item_sku}])
+            
+        catalog_id = result.scalar()
+
+        if catalog_id is None:
+            raise HTTPException(status_code=404, detail=f"Catalog entry with SKU {item_sku} not found")
         
-    # The customer is new, so make a cart for them
-    cart_dict[cart_id] = [item_sku, cart_item.quantity]
-
-    print(cart_dict)
+    with db.engine.begin() as connection:
+        update_result = connection.execute(
+        sqlalchemy.text(
+            """
+            UPDATE cart
+            SET
+                catalog = :catalog_id,
+                quantity = :quantity
+            WHERE
+                id = :cart_id
+            """),
+        [{"quantity": cart_item.quantity, "cart_id": cart_id, "catalog_id": catalog_id}])
+        
+    return "ok"
     
-    return "OK"
-
 class CartCheckout(BaseModel):
     payment: str
 
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
+    pass
 
+    '''
     print(cart_dict)
 
     cart_info = cart_dict[cart_id]
@@ -147,3 +203,4 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="cart_id does not exist, cart not created"
         )
+    '''
