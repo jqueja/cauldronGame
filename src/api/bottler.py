@@ -53,9 +53,9 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                 """
                 UPDATE global_inventory
                 SET num_red_ml = num_red_ml - :red_index * :quantity,
-                    num_green_ml = num_green_ml - :green_index * quantity,
-                    num_blue_ml = num_blue_ml - :blue_index * quantity,
-                    num_dark_ml = num_dark_ml - :dark_index * quantity
+                    num_green_ml = num_green_ml - :green_index * :quantity,
+                    num_blue_ml = num_blue_ml - :blue_index * :quantity,
+                    num_dark_ml = num_dark_ml - :dark_index * :quantity
                 """),
         [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index, "quantity": cur_potion.quantity}])
 
