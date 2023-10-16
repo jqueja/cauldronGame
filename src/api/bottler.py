@@ -48,6 +48,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                 """),
         [{"quantity": cur_potion.quantity, "potion_type": cur_potion.potion_type}])
             
+            # Add to check if you can actually take it
             connection.execute(
             sqlalchemy.text(
                 """
