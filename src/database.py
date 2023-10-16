@@ -26,9 +26,10 @@ def get_red_potions():
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
 
-        return row.num_red_potions
+        num_red = result.scalar()
+
+        return num_red
     
 def get_green_potions():
     #print("In the helper GET red potions")
@@ -41,9 +42,10 @@ def get_green_potions():
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
 
-        return row.num_green_potions
+        num_green = result.scalar()
+
+        return num_green
     
 def get_blue_potions():
     #print("In the helper GET red potions")
@@ -56,9 +58,10 @@ def get_blue_potions():
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
 
-        return row.num_blue_potions
+        num_blue = result.scalar()
+
+        return num_blue
     
 def get_dark_potions():
     #print("In the helper GET red potions")
@@ -71,9 +74,10 @@ def get_dark_potions():
 
     with db.engine.begin() as connection:
         result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
 
-        return row.num_dark_potions
+        num_dark = result.scalar()
+
+        return num_dark
     
 def get_red_ml():
     #print("In the helper GET red mL")
