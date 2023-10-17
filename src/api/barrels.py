@@ -116,7 +116,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             print(cur_barrel.sku)
 
             cur_gold -= total_price
-            cur_red_ml -= cur_barrel.ml_per_barrel * cur_barrel.quantity
+            cur_red_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
 
             barrel_plan.append (
                 {
@@ -131,7 +131,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             print(cur_barrel.sku)
 
             cur_gold -= total_price
-            cur_green_ml -= cur_barrel.ml_per_barrel * cur_barrel.quantity
+            cur_green_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
 
             barrel_plan.append (
                 {
@@ -146,7 +146,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             print(cur_barrel.sku)
 
             cur_gold -= total_price
-            cur_blue_ml -= cur_barrel.ml_per_barrel * cur_barrel.quantity
+            cur_blue_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
 
             barrel_plan.append (
                 {
@@ -161,7 +161,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             print(cur_barrel.sku)
 
             cur_gold -= total_price
-            cur_dark_ml -= cur_barrel.ml_per_barrel * cur_barrel.quantity
+            cur_dark_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
 
             barrel_plan.append (
                 {

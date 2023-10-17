@@ -82,12 +82,15 @@ def get_bottle_plan():
 
         potion_lst = empty_potions.fetchall()
 
+        print(f"bottler {potion_lst}")
+
         cur_red_ml = get_red_ml()
         cur_green_ml = get_green_ml()
         cur_blue_ml = get_blue_ml()
         cur_dark_ml = get_dark_ml()
 
         for cur_potion in potion_lst:
+            print(cur_potion)
             red_index = cur_potion.potion_type[0]
             green_index = cur_potion.potion_type[1]
             blue_index = cur_potion.potion_type[2]
@@ -107,6 +110,6 @@ def get_bottle_plan():
                     }
                 )
 
-        #print(potion_lst)
+    print(bottle_plan)
 
     return bottle_plan
