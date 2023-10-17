@@ -33,35 +33,50 @@ class PotionInventory(BaseModel):
 @router.post("/deliver")
 def post_deliver_bottles(potions_delivered: list[PotionInventory]):
 
-    for cur_potion in potions_delivered:
+    cur_red_ml = get_red_ml()
+    cur_green_ml = get_green_ml()
+    cur_blue_ml = get_blue_ml()
+    cur_dark_ml = get_dark_ml()
 
+    for cur_potion in potions_delivered:
         red_index = cur_potion.potion_type[0]
         green_index = cur_potion.potion_type[1]
         blue_index = cur_potion.potion_type[2]
         dark_index = cur_potion.potion_type[3]
 
+        # Check if subtracting the quantity will result in negative values
+        if (
+            cur_red_ml - red_index * cur_potion.quantity < 0 or
+            cur_green_ml - green_index * cur_potion.quantity < 0 or
+            cur_blue_ml - blue_index * cur_potion.quantity < 0 or
+            cur_dark_ml - dark_index * cur_potion.quantity < 0
+        ):  
+            print(f"Not enough ingredients to make {cur_potion.potion_type}. Skipping...")
+            continue
+        
+        print(f"enough ingredients to make {cur_potion.potion_type}. MONEY")
         with db.engine.begin() as connection:
             connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE catalog
-                SET inventory = inventory + :quantity WHERE potion_type = :potion_type
-                """),
-        [{"quantity": cur_potion.quantity, "potion_type": cur_potion.potion_type}])
-            
-            # Add to check if you can actually take it
+                sqlalchemy.text(
+                    """
+                    UPDATE catalog
+                    SET inventory = inventory + :quantity WHERE potion_type = :potion_type
+                    """),
+                [{"quantity": cur_potion.quantity, "potion_type": cur_potion.potion_type}])
+
             connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE global_inventory
-                SET num_red_ml = num_red_ml - :red_index * :quantity,
-                    num_green_ml = num_green_ml - :green_index * :quantity,
-                    num_blue_ml = num_blue_ml - :blue_index * :quantity,
-                    num_dark_ml = num_dark_ml - :dark_index * :quantity
-                """),
-        [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index, "quantity": cur_potion.quantity}])
+                sqlalchemy.text(
+                    """
+                    UPDATE global_inventory
+                    SET num_red_ml = num_red_ml - :red_index * :quantity,
+                        num_green_ml = num_green_ml - :green_index * :quantity,
+                        num_blue_ml = num_blue_ml - :blue_index * :quantity,
+                        num_dark_ml = num_dark_ml - :dark_index * :quantity
+                    """),
+                [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index, "quantity": cur_potion.quantity}])
 
     return "ok"
+
 
 
 
@@ -74,6 +89,8 @@ def get_bottle_plan():
     cur_blue_ml = get_blue_ml()
     cur_dark_ml = get_dark_ml()
 
+    print()
+
     while True:
         can_make_potion = False  # Flag to check if any potions can be made in this iteration
 
@@ -83,24 +100,27 @@ def get_bottle_plan():
                 """
                 SELECT name, potion_type, inventory
                 FROM catalog
-                ORDER BY
-                    CASE
-                        WHEN SKU = 'RAINBOW_POTION' then 1
-                        WHEN SKU = 'PURPLE_POTION' THEN 2
-                        WHEN SKU = 'BROWN_POTION' THEN 3
-                        WHEN SKU = 'TEAL_POTION' THEN 4
-                        ELSE 5
-                    END,
-                    inventory ASC
+                ORDER BY catalog.priority ASC
                 """
             )
         )
 
             potion_lst = empty_potions.fetchall()
             print(potion_lst)
+            
 
             for potion in potion_lst:
                 red_index, green_index, blue_index, dark_index = potion.potion_type
+                print("--------")
+                print(red_index)
+                print(green_index)
+                print(blue_index)
+                print(dark_index)
+
+                print("Current Red ML:", cur_red_ml)
+                print("Current Green ML:", cur_green_ml)
+                print("Current Blue ML:", cur_blue_ml)
+                print("Current Dark ML:", cur_dark_ml)
 
                 if (
                     red_index <= cur_red_ml

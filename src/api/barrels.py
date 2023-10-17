@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from src.api import auth
 
@@ -30,59 +30,101 @@ class Barrel(BaseModel):
 
 # Purchase Battels, increase red ml, check if you can purchase the barrels
 # Only buy red
-'''
-'''
 
-'''
-NOTE: Can we trust the call? Do we have to check for potion type as well?
-'''
+
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
-    print(barrels_delivered)
+    print("/deliver barrels")
 
-    gold_paid = 0
-    red_ml = 0
-    blue_ml = 0
-    green_ml = 0
-    dark_ml = 0
+    cur_gold = get_gold()
+    cur_red_ml = get_red_ml()
+    cur_green_ml = get_green_ml()
+    cur_blue_ml = get_blue_ml()
+    cur_dark_ml = get_dark_ml()
 
-    for barrel_delivered in barrels_delivered:
-        gold_paid += barrel_delivered.price * barrel_delivered.quantity
+    print(f" Gold: {cur_gold}")
+    print(f" Red: {cur_red_ml}")
+    print(f" Green: {cur_green_ml}")
+    print(f" Blue: {cur_blue_ml}")
+    print(f" Dark {cur_dark_ml}")
 
-        # Red Potion
-        if barrel_delivered.potion_type == [1,0,0,0]:
-            red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+    
 
-        # Green Potion
-        elif barrel_delivered.potion_type == [0, 1, 0, 0]:
-            green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+    barrel_queue = []
 
-        # Blue Potion
-        elif barrel_delivered.potion_type == [0, 0, 1, 0]:
-            blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+    for cur_barrel in barrels_delivered:
+        # Calculate the need priority dynamically based on current quantities
+        need_priority = 0
+        if cur_barrel.potion_type == [1, 0, 0, 0]:
+            need_priority = -cur_red_ml  
+        elif cur_barrel.potion_type == [0, 1, 0, 0]:
+            need_priority = -cur_green_ml  
+        elif cur_barrel.potion_type == [0, 0, 1, 0]:
+            need_priority = -cur_blue_ml  
+        elif cur_barrel.potion_type == [0, 0, 0, 1]:
+            need_priority = -cur_dark_ml  
 
-        # Dark Potion
-        elif barrel_delivered.potion_type == [0, 0, 0, 1]:
-            dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+        # Use a tuple with need_priority, lower price, and barrel object as the key
+        barrel_entry = (need_priority, cur_barrel.price, cur_barrel)
+        heapq.heappush(barrel_queue, barrel_entry)
 
-        else:
-            raise Exception("Invalid potion type")
+    barrel_plan = []
+
+    while barrel_queue:
+        # Pop the barrel with the highest priority
+        pop_result = heapq.heappop(barrel_queue)
+        cur_barrel = pop_result[2]
         
-    print(f"gold_paid: {gold_paid}, red_ml: {red_ml}, blue_ml: {blue_ml}, dark_ml: {dark_ml}")
+        total_price = (cur_barrel.price * cur_barrel.quantity)
+
+        if total_price <= cur_gold:
+            print(f"Buying {cur_barrel.potion_type} - {cur_barrel.sku}")
+            print(f"Price: {total_price}")
+            print(f"ml in barrel: {cur_barrel.quantity * cur_barrel.ml_per_barrel}")
+
+            cur_gold -= total_price
+
+            if cur_barrel.potion_type == [1, 0, 0, 0]:
+                cur_red_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+            elif cur_barrel.potion_type == [0, 1, 0, 0]:
+                cur_green_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+            elif cur_barrel.potion_type == [0, 0, 1, 0]:
+                cur_blue_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+            elif cur_barrel.potion_type == [0, 0, 0, 1]:
+                cur_dark_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+
+            barrel_plan.append(
+                {
+                    "sku": cur_barrel.sku,
+                    "quantity": cur_barrel.quantity,
+                }
+            )
+
+            # Re-calculate the need priority for the remaining barrels
+            barrel_queue = [(priority, price, barrel) for priority, price, barrel in barrel_queue if barrel != cur_barrel]
+
+    print(f" Gold: {cur_gold}")
+    print(f" Red: {cur_red_ml}")
+    print(f" Green: {cur_green_ml}")
+    print(f" Blue: {cur_blue_ml}")
+    print(f" Dark {cur_dark_ml}")
+
+    print(barrel_plan)
+
 
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
                 """
                 UPDATE global_inventory SET
-                num_red_ml = num_red_ml + :red_ml,
-                num_green_ml = num_green_ml + :green_ml,
-                num_blue_ml = num_blue_ml + :blue_ml,
-                num_dark_ml = num_dark_ml + :dark_ml,
-                gold = gold - :gold_paid
+                num_red_ml = :red_ml,
+                num_green_ml = :green_ml,
+                num_blue_ml = :blue_ml,
+                num_dark_ml = :dark_ml,
+                gold = :gold_paid
                 """),
-        [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml, "gold_paid": gold_paid}])
+        [{"red_ml": cur_red_ml, "green_ml": cur_green_ml, "blue_ml": cur_blue_ml, "dark_ml": cur_dark_ml, "gold_paid": cur_gold}])
 
     return "ok"
 
@@ -97,6 +139,8 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 #NOTE: Sort the Barrels buy the cheapest to get the most money
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
+
+    print("/plan barrels")
 
     cur_gold = get_gold()
     cur_red_ml = get_red_ml()
@@ -131,6 +175,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     barrel_plan = []
 
     while barrel_queue:
+        print(barrel_queue)
         # Pop the barrel with the highest priority
         pop_result = heapq.heappop(barrel_queue)
         cur_barrel = pop_result[2]
@@ -140,6 +185,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         if total_price <= cur_gold:
             print(f"Buying {cur_barrel.potion_type} - {cur_barrel.sku}")
             print(f"Price: {total_price}")
+
 
             cur_gold -= total_price
 
@@ -168,4 +214,64 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     print(f" Blue: {cur_blue_ml}")
     print(f" Dark {cur_dark_ml}")
 
+    print(barrel_plan)
+
     return barrel_plan
+
+
+
+
+'''
+@router.post("/deliver")
+def post_deliver_barrels(barrels_delivered: list[Barrel]):
+
+    print(barrels_delivered)
+
+    gold_paid = 0
+    red_ml = 0
+    blue_ml = 0
+    green_ml = 0
+    dark_ml = 0
+
+    for barrel_delivered in barrels_delivered:
+        gold_paid += barrel_delivered.price * barrel_delivered.quantity
+
+        # Red Potion
+        if barrel_delivered.potion_type == [1,0,0,0]:
+            red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Green Potion
+        elif barrel_delivered.potion_type == [0, 1, 0, 0]:
+            green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Blue Potion
+        elif barrel_delivered.potion_type == [0, 0, 1, 0]:
+            blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Dark Potion
+        elif barrel_delivered.potion_type == [0, 0, 0, 1]:
+            dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid potion type in barrels"
+            )
+        
+    print(f"gold_paid: {gold_paid}, red_ml: {red_ml}, blue_ml: {blue_ml}, dark_ml: {dark_ml}")
+
+    with db.engine.begin() as connection:
+        connection.execute(
+            sqlalchemy.text(
+                """
+                UPDATE global_inventory SET
+                num_red_ml = num_red_ml + :red_ml,
+                num_green_ml = num_green_ml + :green_ml,
+                num_blue_ml = num_blue_ml + :blue_ml,
+                num_dark_ml = num_dark_ml + :dark_ml,
+                gold = gold - :gold_paid
+                """),
+        [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml, "gold_paid": gold_paid}])
+
+    return "ok"
+'''

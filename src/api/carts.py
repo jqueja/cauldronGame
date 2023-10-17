@@ -20,16 +20,20 @@ class NewCart(BaseModel):
 
 #cart_id = 0
 
+
+# DONT FORGET TO UPLOAD THE SCEMA SQL
+
 @router.post("/")
 def create_cart(new_cart: NewCart):
     with db.engine.begin() as connection:
         result = connection.execute(
         sqlalchemy.text(
             """
-            INSERT INTO cart
-            DEFAULT VALUES
-            RETURNING id;
-            """)
+            INSERT INTO cart (customer)
+            VALUES (:customer)
+            RETURNING cart_id;
+            """),
+        {"customer": new_cart.customer}
         )
 
     id_call = result.scalar()
@@ -39,49 +43,7 @@ def create_cart(new_cart: NewCart):
     
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
-    with db.engine.begin() as connection:
-        result = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT catalog, quantity
-                FROM cart
-                LEFT JOIN catalog ON cart.id = catalog.id
-                WHERE cart.id = :cart_id
-                """
-            ),
-            {"cart_id": cart_id}
-        )
-
-        result_cart = result.fetchall()
-
-        if not result_cart:
-            raise HTTPException(status_code=404, detail=f"Cart with ID {cart_id} not found")
-        
-        row = result_cart[0]
-        catalog_id = row.catalog
-        quantity = row.quantity
-
-    with db.engine.begin() as connection:
-        catalog_result = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT name
-                FROM catalog
-                WHERE id = :catalog_id
-                """
-            ),
-            {"catalog_id": catalog_id}
-        )
-
-        # Gets the potion name
-        content = catalog_result.scalar()
-        
-        return [
-            {
-            "catalog_name": content,
-            "quantity": quantity
-            }
-        ] 
+    pass
 
 class CartItem(BaseModel):
     quantity: int
@@ -91,41 +53,126 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 
     with db.engine.begin() as connection:
         result = connection.execute(
-        sqlalchemy.text(
-            """
-            SELECT id
-            FROM catalog
-            WHERE sku = :item_sku
-            """),
-        [{"item_sku": item_sku}])
-            
-        catalog_id = result.scalar()
+            sqlalchemy.text(
+                """
+                SELECT cart_id
+                FROM cart
+                WHERE cart_id = :cart_id
+                """
+            ),
+            {"cart_id": cart_id}
+        )
 
-        if catalog_id is None:
-            raise HTTPException(status_code=404, detail=f"Catalog entry with SKU {item_sku} not found")
+    cart_row_num = result.scalar()
+    print(cart_row_num)
+
+    if cart_row_num:
+        print("Cart id does EXIST")
+        with db.engine.begin() as connection:
+            catalog_result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT id AS catalog_id
+                    FROM catalog
+                    WHERE sku = :item_sku
+                    """
+                ),
+                {"item_sku": item_sku}
+            )
         
-    with db.engine.begin() as connection:
-        update_result = connection.execute(
-        sqlalchemy.text(
-            """
-            UPDATE cart
-            SET
-                catalog = :catalog_id,
-                quantity = :quantity
-            WHERE
-                id = :cart_id
-            """),
-        [{"quantity": cart_item.quantity, "cart_id": cart_id, "catalog_id": catalog_id}])
-        
-    return "ok"
+        catalog_row_num = catalog_result.scalar()
+        print(catalog_row_num)
+
+        if catalog_row_num:
+            with db.engine.begin() as connection:
+                insert_result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO cart_items (cart_id, catalog_id, quantity)
+                    VALUES (:cart_id, :catalog_id, :quantity)
+                    """
+                ),
+                [{"cart_id": cart_row_num, "catalog_id": catalog_row_num, "quantity": cart_item.quantity}])
+
+        else:
+            print("Catalog does NOT EXIST")
+
+    else:
+        print("Cart id does NOT EXIST")
     
 class CartCheckout(BaseModel):
     payment: str
 
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
-    pass
 
+    with db.engine.begin() as connection:
+        cart_item_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT cart_id, catalog_id, quantity
+                FROM cart_items
+                WHERE cart_id = :cart_id
+                """
+            ),
+            {"cart_id": cart_id}
+        )
+
+        cart_items = cart_item_result.fetchall()
+    
+        for item in cart_items:
+            cart_id_result = item[0]
+            catalog_id_result = item[1]
+            quantity_result = item[2]
+            print("-----------")
+            print(f" cart id: {cart_id_result}")
+            print(f" catalog_id: {catalog_id_result}")
+            print(f" quantity: {quantity_result}")
+
+            with db.engine.begin() as connection:
+                catalog_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        SELECT sku, name, inventory, price
+                        FROM catalog
+                        WHERE id = :catalog_id
+                        """
+                    ),
+                    {"catalog_id": catalog_id_result}
+            )
+            # Can use the Cols
+            potion = catalog_result.fetchone()
+            print(potion)
+
+            print(quantity_result)
+            print(potion.inventory)
+            # You can Buy it! 
+            if quantity_result <= potion.inventory:
+                print(f"I am SELLING this: {potion}")
+                
+                with db.engine.begin() as connection:
+                    result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        UPDATE catalog
+                        SET inventory = inventory - :cart_quantity
+                        WHERE id = :catalog_id
+                        """),
+                    [{"catalog_id": catalog_id_result, "cart_quantity": quantity_result}])
+
+                # Updating global inventory
+                with db.engine.begin() as connection:
+                    result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        UPDATE global_inventory
+                        SET gold = gold + :cart_quantity * :catalog_price
+                        """),
+                    [{"cart_quantity": quantity_result, "catalog_price": potion.price}])
+                    
+    return "ok"
+
+            
 
 
 
