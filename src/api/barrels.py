@@ -97,15 +97,22 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     cur_blue_ml = get_blue_ml()
     cur_dark_ml = get_dark_ml()
 
-    print(cur_gold)
-    print(cur_red_ml)
-    print(cur_green_ml)
-    print(cur_blue_ml)
-    print(cur_dark_ml)
+    print(f" Gold: {cur_gold}")
+    print(f" Red: {cur_red_ml}")
+    print(f" Green: {cur_green_ml}")
+    print(f" Blue: {cur_blue_ml}")
+    print(f" Dark {cur_dark_ml}")
 
     barrel_plan = []
 
     for cur_barrel in wholesale_catalog:
+        
+        print("-------------------")
+        print(f" Gold: {cur_gold}")
+        print(f" Red: {cur_red_ml}")
+        print(f" Green: {cur_green_ml}")
+        print(f" Blue: {cur_blue_ml}")
+        print(f" Dark {cur_dark_ml}")
 
         total_price = (cur_barrel.price * cur_barrel.quantity)
 
@@ -169,5 +176,10 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
                     "quantity": cur_barrel.quantity,
                 }
             )
+    print(f" Gold: {cur_gold}")
+    print(f" Red: {cur_red_ml}")
+    print(f" Green: {cur_green_ml}")
+    print(f" Blue: {cur_blue_ml}")
+    print(f" Dark {cur_dark_ml}")
 
     return barrel_plan
