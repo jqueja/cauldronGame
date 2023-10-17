@@ -63,8 +63,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         barrel_entry = (need_priority, cur_barrel.price, cur_barrel)
         heapq.heappush(barrel_queue, barrel_entry)
 
-    barrel_plan = []
-
     while barrel_queue:
         # Pop the barrel with the highest priority
         pop_result = heapq.heappop(barrel_queue)
@@ -91,20 +89,11 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
             elif cur_barrel.potion_type == [0, 0, 0, 1]:
                 cur_dark_ml += cur_barrel.ml_per_barrel * quantity_to_buy
 
-            barrel_plan.append(
-                {
-                    "sku": cur_barrel.sku,
-                    "quantity": cur_barrel.quantity,
-                }
-            )
-
     print(f" Gold: {cur_gold}")
     print(f" Red: {cur_red_ml}")
     print(f" Green: {cur_green_ml}")
     print(f" Blue: {cur_blue_ml}")
     print(f" Dark {cur_dark_ml}")
-
-    print(barrel_plan)
 
     with db.engine.begin() as connection:
         connection.execute(

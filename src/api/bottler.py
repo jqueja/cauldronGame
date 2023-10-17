@@ -44,12 +44,29 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
         blue_index = cur_potion.potion_type[2]
         dark_index = cur_potion.potion_type[3]
 
-        # Check if subtracting the quantity will result in negative values
+        '''
+        red_max_quantity = cur_red_ml // red_index if red_index != 0 else float(1000)
+        green_max_quantity = cur_green_ml // green_index if green_index != 0 else float(1000)
+        blue_max_quantity = cur_blue_ml // blue_index if blue_index != 0 else float(1000)
+        dark_max_quantity = cur_dark_ml // dark_index if dark_index != 0 else float(1000)
+
+        print(red_index)
+        print(red_max_quantity)
+        print(green_index)
+        print(green_max_quantity)
+        print(blue_index)
+        print(blue_max_quantity)
+        print(dark_index)
+        print(dark_max_quantity)
+        min_max_quantity = min(red_max_quantity, green_max_quantity, blue_max_quantity, dark_max_quantity)
+        '''
+
+        # for now just do one, red_max_quantity
         if (
-            cur_red_ml - red_index * cur_potion.quantity < 0 or
-            cur_green_ml - green_index * cur_potion.quantity < 0 or
-            cur_blue_ml - blue_index * cur_potion.quantity < 0 or
-            cur_dark_ml - dark_index * cur_potion.quantity < 0
+            cur_red_ml - red_index * 1 <= -1 or
+            cur_green_ml - green_index * 1 <= -1 or
+            cur_blue_ml - blue_index * 1 <= -1 or
+            cur_dark_ml - dark_index * 1 <= -1
         ):  
             print(f"Not enough ingredients to make {cur_potion.potion_type}. Skipping...")
             continue
@@ -60,20 +77,20 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                 sqlalchemy.text(
                     """
                     UPDATE catalog
-                    SET inventory = inventory + :quantity WHERE potion_type = :potion_type
+                    SET inventory = inventory + 1 WHERE potion_type = :potion_type
                     """),
-                [{"quantity": cur_potion.quantity, "potion_type": cur_potion.potion_type}])
+                [{"potion_type": cur_potion.potion_type}])
 
             connection.execute(
                 sqlalchemy.text(
                     """
                     UPDATE global_inventory
-                    SET num_red_ml = num_red_ml - :red_index * :quantity,
-                        num_green_ml = num_green_ml - :green_index * :quantity,
-                        num_blue_ml = num_blue_ml - :blue_index * :quantity,
-                        num_dark_ml = num_dark_ml - :dark_index * :quantity
+                    SET num_red_ml = num_red_ml - :red_index * 1,
+                        num_green_ml = num_green_ml - :green_index * 1,
+                        num_blue_ml = num_blue_ml - :blue_index * 1,
+                        num_dark_ml = num_dark_ml - :dark_index * 1
                     """),
-                [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index, "quantity": cur_potion.quantity}])
+                [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index}])
 
     return "ok"
 
@@ -208,6 +225,18 @@ def get_bottle_plan():
                 )
 
     print(bottle_plan)
+
+    connection.execute(
+                sqlalchemy.text(
+                    """
+                    UPDATE global_inventory
+                    SET num_red_ml = num_red_ml - :red_index * :red_max_quantity,
+                        num_green_ml = num_green_ml - :green_index * :green_max_quantity,
+                        num_blue_ml = num_blue_ml - :blue_index * :blue_max_quantity,
+                        num_dark_ml = num_dark_ml - :dark_index * :dark_max_quantity
+                    """),
+                [{"red_index": red_index, "green_index": green_index, "blue_index": blue_index, "dark_index": dark_index, "quantity": cur_potion.quantity, "red_max_quantity": red_max_quantity,
+                  "green_max_quantity": green_max_quantity, "blue_max_quantity": blue_index, "dark_max_quantity": dark_max_quantity}])
 
     return bottle_plan
     '''

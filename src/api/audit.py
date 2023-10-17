@@ -17,6 +17,9 @@ def get_inventory():
     total_potions = get_red_potions() + get_green_potions() + get_blue_potions() + get_dark_potions()
     total_ml = get_red_ml() + get_blue_ml() + get_green_ml() + get_dark_ml()
 
+    print(total_potions)
+    print(total_ml)
+
     return {"number_of_potions": total_potions,
         "ml_in_barrels": total_ml,
         "gold": get_gold()
