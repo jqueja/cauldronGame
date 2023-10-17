@@ -31,12 +31,8 @@ class Barrel(BaseModel):
 # Purchase Battels, increase red ml, check if you can purchase the barrels
 # Only buy red
 
-
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
-
-    print("/deliver barrels")
-
     cur_gold = get_gold()
     cur_red_ml = get_red_ml()
     cur_green_ml = get_green_ml()
@@ -49,21 +45,19 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     print(f" Blue: {cur_blue_ml}")
     print(f" Dark {cur_dark_ml}")
 
-    
-
     barrel_queue = []
 
     for cur_barrel in barrels_delivered:
-        # Calculate the need priority dynamically based on current quantities
+        # Calculate the need priority dynamically based on the current quantities
         need_priority = 0
         if cur_barrel.potion_type == [1, 0, 0, 0]:
-            need_priority = -cur_red_ml  
+            need_priority = cur_red_ml
         elif cur_barrel.potion_type == [0, 1, 0, 0]:
-            need_priority = -cur_green_ml  
+            need_priority = cur_green_ml
         elif cur_barrel.potion_type == [0, 0, 1, 0]:
-            need_priority = -cur_blue_ml  
+            need_priority = cur_blue_ml
         elif cur_barrel.potion_type == [0, 0, 0, 1]:
-            need_priority = -cur_dark_ml  
+            need_priority = cur_dark_ml
 
         # Use a tuple with need_priority, lower price, and barrel object as the key
         barrel_entry = (need_priority, cur_barrel.price, cur_barrel)
@@ -75,24 +69,27 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         # Pop the barrel with the highest priority
         pop_result = heapq.heappop(barrel_queue)
         cur_barrel = pop_result[2]
-        
-        total_price = (cur_barrel.price * cur_barrel.quantity)
+
+        max_quantity_affordable = cur_gold // cur_barrel.price
+        quantity_to_buy = min(max_quantity_affordable, cur_barrel.quantity)
+
+        total_price = (cur_barrel.price * quantity_to_buy)
 
         if total_price <= cur_gold:
             print(f"Buying {cur_barrel.potion_type} - {cur_barrel.sku}")
             print(f"Price: {total_price}")
-            print(f"ml in barrel: {cur_barrel.quantity * cur_barrel.ml_per_barrel}")
+            print(f"ml in barrel: {quantity_to_buy * cur_barrel.ml_per_barrel}")
 
             cur_gold -= total_price
 
             if cur_barrel.potion_type == [1, 0, 0, 0]:
-                cur_red_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_red_ml += cur_barrel.ml_per_barrel * quantity_to_buy
             elif cur_barrel.potion_type == [0, 1, 0, 0]:
-                cur_green_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_green_ml += cur_barrel.ml_per_barrel * quantity_to_buy
             elif cur_barrel.potion_type == [0, 0, 1, 0]:
-                cur_blue_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_blue_ml += cur_barrel.ml_per_barrel * quantity_to_buy
             elif cur_barrel.potion_type == [0, 0, 0, 1]:
-                cur_dark_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_dark_ml += cur_barrel.ml_per_barrel * quantity_to_buy
 
             barrel_plan.append(
                 {
@@ -101,9 +98,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 }
             )
 
-            # Re-calculate the need priority for the remaining barrels
-            barrel_queue = [(priority, price, barrel) for priority, price, barrel in barrel_queue if barrel != cur_barrel]
-
     print(f" Gold: {cur_gold}")
     print(f" Red: {cur_red_ml}")
     print(f" Green: {cur_green_ml}")
@@ -111,7 +105,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     print(f" Dark {cur_dark_ml}")
 
     print(barrel_plan)
-
 
     with db.engine.begin() as connection:
         connection.execute(
@@ -136,7 +129,6 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
 # Version 2: How much barrels I can buy in general
 
-#NOTE: Sort the Barrels buy the cheapest to get the most money
 @router.post("/plan")
 def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
 
@@ -175,14 +167,22 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
     barrel_plan = []
 
     while barrel_queue:
-        print(barrel_queue)
+        #print(barrel_queue)
         # Pop the barrel with the highest priority
         pop_result = heapq.heappop(barrel_queue)
         cur_barrel = pop_result[2]
         
-        total_price = (cur_barrel.price * cur_barrel.quantity)
+        # Assuming cur_gold is the current budget
+        max_quantity_affordable = cur_gold // cur_barrel.price
+        quantity_to_buy = min(max_quantity_affordable, cur_barrel.quantity)
+
+        print(cur_barrel.price)
+        print(quantity_to_buy)
+
+        total_price = (cur_barrel.price * quantity_to_buy)
 
         if total_price <= cur_gold:
+
             print(f"Buying {cur_barrel.potion_type} - {cur_barrel.sku}")
             print(f"Price: {total_price}")
 
@@ -190,13 +190,13 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
             cur_gold -= total_price
 
             if cur_barrel.potion_type == [1, 0, 0, 0]:
-                cur_red_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_red_ml += cur_barrel.ml_per_barrel * quantity_to_buy
             elif cur_barrel.potion_type == [0, 1, 0, 0]:
-                cur_green_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_green_ml += cur_barrel.ml_per_barrel * quantity_to_buy
             elif cur_barrel.potion_type == [0, 0, 1, 0]:
-                cur_blue_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_blue_ml += cur_barrel.ml_per_barrel * quantity_to_buy
             elif cur_barrel.potion_type == [0, 0, 0, 1]:
-                cur_dark_ml += cur_barrel.ml_per_barrel * cur_barrel.quantity
+                cur_dark_ml += cur_barrel.ml_per_barrel * quantity_to_buy
 
             barrel_plan.append(
                 {
