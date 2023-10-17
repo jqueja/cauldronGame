@@ -179,6 +179,9 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         print(cur_barrel.price)
         print(quantity_to_buy)
 
+        max_quantity_affordable = cur_gold // cur_barrel.price
+        quantity_to_buy = min(max_quantity_affordable, cur_barrel.quantity)
+
         total_price = (cur_barrel.price * quantity_to_buy)
 
         if total_price <= cur_gold:
