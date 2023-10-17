@@ -124,6 +124,15 @@ class CartCheckout(BaseModel):
 
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
+    pass
+
+
+
+
+
+'''
+@router.post("/{cart_id}/checkout")
+def checkout(cart_id: int, cart_checkout: CartCheckout):
 
     # Getting data from cart, 
     with db.engine.begin() as connection:
@@ -201,3 +210,4 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         
         
     return "ok"
+    '''

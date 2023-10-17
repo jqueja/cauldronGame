@@ -79,14 +79,22 @@ def get_bottle_plan():
 
         with db.engine.begin() as connection:
             empty_potions = connection.execute(
-                sqlalchemy.text(
-                    """
-                    SELECT name, potion_type, inventory
-                    FROM catalog
-                    ORDER BY inventory ASC
-                    """
-                )
+            sqlalchemy.text(
+                """
+                SELECT name, potion_type, inventory
+                FROM catalog
+                ORDER BY
+                    CASE
+                        WHEN SKU = 'RAINBOW_POTION' then 1
+                        WHEN SKU = 'PURPLE_POTION' THEN 2
+                        WHEN SKU = 'BROWN_POTION' THEN 3
+                        WHEN SKU = 'TEAL_POTION' THEN 4
+                        ELSE 5
+                    END,
+                    inventory ASC
+                """
             )
+        )
 
             potion_lst = empty_potions.fetchall()
             print(potion_lst)
