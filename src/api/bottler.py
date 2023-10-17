@@ -10,6 +10,7 @@ from ..database import *
 from ..helper import *
 
 
+
 router = APIRouter(
     prefix="/bottler",
     tags=["bottler"],
@@ -63,8 +64,76 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     return "ok"
 
 
-# Gets called 4 times a day
-# return potions type and quantity
+
+
+@router.post("/plan")
+def get_bottle_plan():
+    bottle_plan = []
+    cur_red_ml = get_red_ml()
+    cur_green_ml = get_green_ml()
+    cur_blue_ml = get_blue_ml()
+    cur_dark_ml = get_dark_ml()
+
+    while True:
+        can_make_potion = False  # Flag to check if any potions can be made in this iteration
+
+        with db.engine.begin() as connection:
+            empty_potions = connection.execute(
+                sqlalchemy.text(
+                    """
+                    SELECT name, potion_type, inventory
+                    FROM catalog
+                    ORDER BY inventory ASC
+                    """
+                )
+            )
+
+            potion_lst = empty_potions.fetchall()
+            print(potion_lst)
+
+            for potion in potion_lst:
+                red_index, green_index, blue_index, dark_index = potion.potion_type
+
+                if (
+                    red_index <= cur_red_ml
+                    and green_index <= cur_green_ml
+                    and blue_index <= cur_blue_ml
+                    and dark_index <= cur_dark_ml
+                ):
+                    cur_red_ml -= red_index
+                    cur_green_ml -= green_index
+                    cur_blue_ml -= blue_index
+                    cur_dark_ml -= dark_index
+
+                    # Check if the potion type is already in the plan
+                    potion_type_exists = False
+                    for entry in bottle_plan:
+                        if entry["potion_type"] == potion.potion_type:
+                            entry["quantity"] += 1
+                            potion_type_exists = True
+                            break
+
+                    # If the potion type is not in the plan, add a new entry
+                    if not potion_type_exists:
+                        bottle_plan.append(
+                            {
+                                "potion_type": potion.potion_type,
+                                "quantity": 1,
+                            }
+                        )
+
+                    can_make_potion = True  # Set the flag to True since a potion was made
+
+        if not can_make_potion:
+            break  # Exit the while loop if no more potions can be made
+
+    print(bottle_plan)
+    return bottle_plan
+
+
+
+
+'''
 @router.post("/plan")
 def get_bottle_plan():
 
@@ -113,3 +182,4 @@ def get_bottle_plan():
     print(bottle_plan)
 
     return bottle_plan
+    '''
