@@ -34,42 +34,50 @@ class Barrel(BaseModel):
 @router.post("/deliver")
 def post_deliver_barrels(barrels_delivered: list[Barrel]):
 
-    cur_gold = get_gold()
-    cur_red_ml = get_red_ml()
-    cur_green_ml = get_green_ml()
-    cur_blue_ml = get_blue_ml()
-    cur_dark_ml = get_dark_ml()
+    print(barrels_delivered)
 
-    for cur_barrel in barrels_delivered:
+    gold_paid = 0
+    red_ml = 0
+    blue_ml = 0
+    green_ml = 0
+    dark_ml = 0
 
-        if (cur_red_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [1, 0, 0, 0]):
-            cur_red_ml += cur_barrel.ml_per_barrel
-            cur_gold -= (cur_barrel.price * 1)
+    for barrel_delivered in barrels_delivered:
+        gold_paid += barrel_delivered.price * barrel_delivered.quantity
 
-        elif (cur_green_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0 ,1, 0, 0]):
-            cur_green_ml += cur_barrel.ml_per_barrel
-            cur_gold -= (cur_barrel.price * 1)
+        # Red Potion
+        if barrel_delivered.potion_type == [1,0,0,0]:
+            red_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
 
-        elif (cur_blue_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0, 0, 1, 0]):
-            cur_blue_ml += cur_barrel.ml_per_barrel
-            cur_gold -= (cur_barrel.price * 1)
+        # Green Potion
+        elif barrel_delivered.potion_type == [0, 1, 0, 0]:
+            green_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
 
-        elif (cur_dark_ml <= 50) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0, 0, 0, 1]):
-            cur_dark_ml += cur_barrel.ml_per_barrel
-            cur_gold -= (cur_barrel.price * 1)
+        # Blue Potion
+        elif barrel_delivered.potion_type == [0, 0, 1, 0]:
+            blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        # Dark Potion
+        elif barrel_delivered.potion_type == [0, 0, 0, 1]:
+            dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
+
+        else:
+            raise Exception("Invalid potion type")
+        
+    print(f"gold_paid: {gold_paid}, red_ml: {red_ml}, blue_ml: {blue_ml}, dark_ml: {dark_ml}")
 
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
                 """
                 UPDATE global_inventory SET
-                num_red_ml = :red_ml,
-                num_green_ml = :green_ml,
-                num_blue_ml = :blue_ml,
-                num_dark_ml = :dark_ml,
-                gold = :gold_paid
+                num_red_ml = num_red_ml + :red_ml,
+                num_green_ml = num_green_ml + :green_ml,
+                num_blue_ml = num_blue_ml + :blue_ml,
+                num_dark_ml = num_dark_ml + :dark_ml,
+                gold = gold - :gold_paid
                 """),
-        [{"red_ml": cur_red_ml, "green_ml": cur_green_ml, "blue_ml": cur_blue_ml, "dark_ml": cur_dark_ml, "gold_paid": cur_gold}])
+        [{"red_ml": red_ml, "green_ml": green_ml, "blue_ml": blue_ml, "dark_ml": dark_ml, "gold_paid": gold_paid}])
 
     return "ok"
         
