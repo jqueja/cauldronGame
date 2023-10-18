@@ -49,7 +49,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
             cur_green_ml += cur_barrel.ml_per_barrel
             cur_gold -= (cur_barrel.price * 1)
 
-        elif (cur_blue_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0, 0, 0, 1]):
+        elif (cur_blue_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0, 0, 1, 0]):
             cur_blue_ml += cur_barrel.ml_per_barrel
             cur_gold -= (cur_barrel.price * 1)
 
