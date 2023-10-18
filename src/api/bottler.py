@@ -37,11 +37,11 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
     cur_green_ml = get_green_ml()
     cur_blue_ml = get_blue_ml()
     cur_dark_ml = get_dark_ml()
-     
+
     for cur_potion in potions_delivered:
-        print(cur_potion)
-            
-        red_index = cur_potion.potion_type[0]
+
+        # Potion recipe    
+        red_index = cur_potion.potion_type[0] * 4
         green_index = cur_potion.potion_type[1]
         blue_index = cur_potion.potion_type[2]
         dark_index = cur_potion.potion_type[3]
@@ -60,7 +60,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                     sqlalchemy.text(
                         """
                         UPDATE catalog SET
-                        inventory = inventory + 1
+                        inventory = inventory + 4
                         WHERE potion_type = :potion_type
                         """),
                 [{"potion_type": cur_potion.potion_type}])
