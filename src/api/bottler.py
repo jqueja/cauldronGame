@@ -105,9 +105,7 @@ def get_bottle_plan():
     cur_green_ml = get_green_ml()
     cur_blue_ml = get_blue_ml()
     cur_dark_ml = get_dark_ml()
-
-    print()
-
+    
     while True:
         can_make_potion = False  # Flag to check if any potions can be made in this iteration
 
