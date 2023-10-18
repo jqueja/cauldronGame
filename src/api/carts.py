@@ -99,6 +99,8 @@ def set_item_quantity(cart_id: int, item_sku: str, cart_item: CartItem):
 
     else:
         print("Cart id does NOT EXIST")
+
+    return cart_id
     
 class CartCheckout(BaseModel):
     payment: str
