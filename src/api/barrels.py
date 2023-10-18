@@ -38,6 +38,7 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
     cur_red_ml = get_red_ml()
     cur_green_ml = get_green_ml()
     cur_blue_ml = get_blue_ml()
+    cur_dark_ml = get_dark_ml()
 
     for cur_barrel in barrels_delivered:
 
@@ -104,6 +105,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         elif (cur_green_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0 ,1, 0, 0]):
             cur_green_ml += cur_barrel.ml_per_barrel
             cur_gold -= (cur_barrel.price * 1)
+            print(cur_barrel.sku)
             purchase_plan.append(
                 {
                     "sku": cur_barrel.sku,
@@ -114,6 +116,7 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         elif (cur_blue_ml <= 100) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0, 0, 1, 0]):
             cur_blue_ml += cur_barrel.ml_per_barrel
             cur_gold -= (cur_barrel.price * 1)
+            print(cur_barrel.sku)
             purchase_plan.append(
                 {
                     "sku": cur_barrel.sku,
@@ -124,9 +127,12 @@ def get_wholesale_purchase_plan(wholesale_catalog: list[Barrel]):
         elif (cur_dark_ml <= 50) and (cur_barrel.price <= cur_gold) and (cur_barrel.potion_type == [0, 0, 0, 1]):
             cur_dark_ml += cur_barrel.ml_per_barrel
             cur_gold -= (cur_barrel.price * 1)
+            print(cur_barrel.sku)
             purchase_plan.append(
                 {
                     "sku": cur_barrel.sku,
                     "quantity": 1,
                 }
             )
+    print(purchase_plan)
+    return purchase_plan
