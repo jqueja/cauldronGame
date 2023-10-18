@@ -39,7 +39,7 @@ def create_cart(new_cart: NewCart):
     id_call = result.scalar()
     print(id_call)
 
-    return id_call
+    return {"cart_id": id_call}
     
 @router.get("/{cart_id}")
 def get_cart(cart_id: int):
