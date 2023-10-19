@@ -148,8 +148,12 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
             print(quantity_result)
             print(potion.inventory)
+
+            # Just try to buy half
+            quantity_half = quantity_result // 2
+
             # You can Buy it! 
-            if quantity_result <= potion.inventory:
+            if quantity_half <= potion.inventory:
                 print(f"I am SELLING this: {potion}")
                 
                 with db.engine.begin() as connection:
@@ -160,7 +164,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         SET inventory = inventory - :cart_quantity
                         WHERE id = :catalog_id
                         """),
-                    [{"catalog_id": catalog_id_result, "cart_quantity": quantity_result}])
+                    [{"catalog_id": catalog_id_result, "cart_quantity": quantity_half}])
 
                 # Updating global inventory
                 with db.engine.begin() as connection:
@@ -170,7 +174,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         UPDATE global_inventory
                         SET gold = gold + :cart_quantity * :catalog_price
                         """),
-                    [{"cart_quantity": quantity_result, "catalog_price": potion.price}])
+                    [{"cart_quantity": quantity_half, "catalog_price": potion.price}])
                     
     return "ok"
 
