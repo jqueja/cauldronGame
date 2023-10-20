@@ -6,6 +6,8 @@ import sqlalchemy
 from src import database as db
 
 from ..database import *
+import random
+
 
 router = APIRouter(
     prefix="/carts",
@@ -129,6 +131,8 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             print("-----------")
             print(f" cart id: {cart_id_result}")
             print(f" catalog_id: {catalog_id_result}")
+
+            # Truly how much they want
             print(f" quantity: {quantity_result}")
 
             with db.engine.begin() as connection:
@@ -149,11 +153,11 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             print(quantity_result)
             print(potion.inventory)
 
-            # Just try to buy half
-            quantity_half = quantity_result // 2
+            # Just pick a random number on how much to sell
+            quantity_to_sell = random.randint(potion.inventory, quantity_result)
 
             # You can Buy it! 
-            if quantity_half <= potion.inventory:
+            if quantity_to_sell <= potion.inventory:
                 print(f"I am SELLING this: {potion}")
                 
                 with db.engine.begin() as connection:
@@ -164,7 +168,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         SET inventory = inventory - :cart_quantity
                         WHERE id = :catalog_id
                         """),
-                    [{"catalog_id": catalog_id_result, "cart_quantity": quantity_half}])
+                    [{"catalog_id": catalog_id_result, "cart_quantity": quantity_to_sell}])
 
                 # Updating global inventory
                 with db.engine.begin() as connection:
@@ -174,7 +178,14 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         UPDATE global_inventory
                         SET gold = gold + :cart_quantity * :catalog_price
                         """),
-                    [{"cart_quantity": quantity_half, "catalog_price": potion.price}])
+                    [{"cart_quantity": quantity_to_sell, "catalog_price": potion.price}])
+
+            else:
+                raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Customer wants too much, don't have enough to sell {potion.name}"
+            )
+
                     
     return "ok"
 
