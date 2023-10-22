@@ -56,6 +56,50 @@ def reset():
                 FROM cart
                 """),
             )
+
+    with db.engine.begin() as connection:
+            connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE
+                FROM gold_ledger_entries
+                """),
+            )
+            
+    with db.engine.begin() as connection:
+            connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE
+                FROM gold_transactions
+                """),
+            )
+
+
+    with db.engine.begin() as connection:
+                description = f"This is the start"
+                catalog_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO gold_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                gold_action_id = catalog_result.scalar()
+
+    with db.engine.begin() as connection:
+            catalog_result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO gold_ledger_entries (gold_transactions_id, change)
+                    VALUES (:gold_action_id, 100)
+                    """
+                ),
+                {"gold_action_id": gold_action_id}
+            )
             
 
     return "OK"

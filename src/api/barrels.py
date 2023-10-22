@@ -64,6 +64,33 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
         else:
             raise Exception("Invalid potion type")
         
+        with db.engine.begin() as connection:
+                description = f"Buying this barrel: {barrel_delivered.sku} with cost of {gold_paid}"
+                catalog_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO gold_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                gold_action_id = catalog_result.scalar()
+
+        minus_value = gold_paid * -1
+        
+        with db.engine.begin() as connection:
+                catalog_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO gold_ledger_entries (gold_transactions_id, change)
+                        VALUES (:gold_action_id, :change)
+                        """
+                    ),
+                    {"gold_action_id": gold_action_id, "change":minus_value}
+            )
+        
     print(f"gold_paid: {gold_paid}, red_ml: {red_ml}, blue_ml: {blue_ml}, dark_ml: {dark_ml}")
 
     with db.engine.begin() as connection:
