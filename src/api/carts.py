@@ -154,10 +154,11 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             print(potion.inventory)
 
             # Just pick a random number on how much to sell
-            quantity_to_sell = random.randint(potion.inventory, quantity_result)
+            quantity_to_sell = min(quantity_result, potion.inventory)
+            print(f"Selling this {quantity_to_sell}")
 
             # You can Buy it! 
-            if quantity_to_sell <= potion.inventory:
+            if quantity_to_sell > 0:
                 print(f"I am SELLING this: {potion}")
                 
                 with db.engine.begin() as connection:
@@ -183,7 +184,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             else:
                 raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Customer wants too much, don't have enough to sell {potion.name}"
+                detail=f"Don't have any to sell :( {potion.name}"
             )
 
                     
