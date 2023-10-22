@@ -57,6 +57,7 @@ def reset():
                 """),
             )
 
+    # For Gold
     with db.engine.begin() as connection:
             connection.execute(
             sqlalchemy.text(
@@ -65,7 +66,6 @@ def reset():
                 FROM gold_ledger_entries
                 """),
             )
-            
     with db.engine.begin() as connection:
             connection.execute(
             sqlalchemy.text(
@@ -75,7 +75,28 @@ def reset():
                 """),
             )
 
+    # For ml
+    with db.engine.begin() as connection:
+            connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE
+                FROM ml_ledger_entries
+                """),
+            )
+    with db.engine.begin() as connection:
+            connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE
+                FROM ml_transactions
+                """),
+            )
 
+
+
+    
+    # This is for Gold
     with db.engine.begin() as connection:
                 description = f"This is the start"
                 catalog_result = connection.execute(
@@ -100,7 +121,119 @@ def reset():
                 ),
                 {"gold_action_id": gold_action_id}
             )
+
+    
+    # This is for red_ml
+    with db.engine.begin() as connection:
+                description = f"This is the start red_ml"
+                ml_result_red = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                ml_action_id = ml_result_red.scalar()
+
+    with db.engine.begin() as connection:
+                red_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        SELECT id
+                        FROM all_ml
+                        WHERE name = 'red_ml';
+                        """
+                    )
+                )
+                red_ml = red_result.scalar()
+
+    with db.engine.begin() as connection:
+            catalog_result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
+                    VALUES (:ml_id, :ml_action_id, 0)
+                    """
+                ),
+                [{"ml_id": red_ml, "ml_action_id": ml_action_id}])
             
+    # This is for green_ml
+    with db.engine.begin() as connection:
+                description = f"This is the start green_ml"
+                ml_result_green = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                ml_action_id = ml_result_green.scalar()
+
+    with db.engine.begin() as connection:
+                green_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        SELECT id
+                        FROM all_ml
+                        WHERE name = 'green_ml';
+                        """
+                    )
+                )
+                green_ml = green_result.scalar()
+
+    with db.engine.begin() as connection:
+            catalog_result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
+                    VALUES (:ml_id, :ml_action_id, 0)
+                    """
+                ),
+                [{"ml_id": green_ml, "ml_action_id": ml_action_id}])
+            
+    # This is for blue_ml
+    with db.engine.begin() as connection:
+                description = f"This is the start blue_ml"
+                ml_result_blue = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                ml_action_id = ml_result_blue.scalar()
+
+    with db.engine.begin() as connection:
+                blue_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        SELECT id
+                        FROM all_ml
+                        WHERE name = 'blue_ml';
+                        """
+                    )
+                )
+                blue_ml = blue_result.scalar()
+
+    with db.engine.begin() as connection:
+            catalog_result = connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
+                    VALUES (:ml_id, :ml_action_id, 0)
+                    """
+                ),
+                [{"ml_id": blue_ml, "ml_action_id": ml_action_id}])
+    
 
     return "OK"
 

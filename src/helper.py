@@ -112,3 +112,17 @@ def dark_ml_change(num):
 
     # what do I return (how can I add some error checking in my code)
 
+
+def get_gold():
+    with db.engine.begin() as connection:
+        gold_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(change) AS balance
+                FROM gold_ledger_entries
+                """),
+        )
+        cur_gold = gold_result.scalar()
+
+        print(cur_gold)
+        return cur_gold
