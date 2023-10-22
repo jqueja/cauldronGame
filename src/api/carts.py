@@ -153,7 +153,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             print(quantity_result)
             print(potion.inventory)
 
-            # Just pick a random number on how much to sell
+            # Pick the most you can sell
             quantity_to_sell = min(quantity_result, potion.inventory)
             print(f"Selling this {quantity_to_sell}")
 
