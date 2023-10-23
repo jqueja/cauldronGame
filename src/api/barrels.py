@@ -66,26 +66,14 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 ml_action_id = ml_result_red.scalar()
 
             with db.engine.begin() as connection:
-                red_result = connection.execute(
-                    sqlalchemy.text(
-                        """
-                        SELECT id
-                        FROM all_ml
-                        WHERE name = 'red_ml';
-                        """
-                    )
-                )
-                red_ml_id = red_result.scalar()  
-
-            with db.engine.begin() as connection:
                 catalog_result = connection.execute(
                     sqlalchemy.text(
                         """
-                        INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
-                        VALUES (:ml_id, :ml_action_id, :red_ml)
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, red_ml)
+                        VALUES (:ml_action_id, :red_ml)
                         """
                     ),
-                    [{"ml_id": red_ml_id, "ml_action_id": ml_action_id, "red_ml": red_ml}])
+                    [{"ml_action_id": ml_action_id, "red_ml": red_ml}])
 
 
         # Green Potion
@@ -110,31 +98,20 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 ml_action_id = ml_result_green.scalar()
 
             with db.engine.begin() as connection:
-                green_result = connection.execute(
-                    sqlalchemy.text(
-                        """
-                        SELECT id
-                        FROM all_ml
-                        WHERE name = 'green_ml';
-                        """
-                    )
-                )
-                green_ml_id = green_result.scalar()  
-
-            with db.engine.begin() as connection:
                 catalog_result = connection.execute(
                     sqlalchemy.text(
                         """
-                        INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
-                        VALUES (:ml_id, :ml_action_id, :green_ml)
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, green_ml)
+                        VALUES (:ml_action_id, :green_ml)
                         """
                     ),
-                    [{"ml_id": green_ml_id, "ml_action_id": ml_action_id, "green_ml": green_ml}])
+                    [{"ml_action_id": ml_action_id, "green_ml": green_ml}])
 
         # Blue Potion
         elif barrel_delivered.potion_type == [0, 0, 1, 0]:
             blue_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
 
+            # Blue Ledger
             with db.engine.begin() as connection:
                 description = f"Adding this blue_ml {blue_ml}"
                 ml_result_blue = connection.execute(
@@ -150,32 +127,23 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 ml_action_id = ml_result_blue.scalar()
 
             with db.engine.begin() as connection:
-                blue_result = connection.execute(
-                    sqlalchemy.text(
-                        """
-                        SELECT id
-                        FROM all_ml
-                        WHERE name = 'blue_ml';
-                        """
-                    )
-                )
-                blue_ml_id = blue_result.scalar()
-
-            with db.engine.begin() as connection:
                 catalog_result = connection.execute(
                     sqlalchemy.text(
                         """
-                        INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
-                        VALUES (:ml_id, :ml_action_id, :blue_ml)
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, blue_ml)
+                        VALUES (:ml_action_id, :blue_ml)
                         """
                     ),
-                    [{"ml_id": blue_ml_id, "ml_action_id": ml_action_id, "blue_ml": blue_ml}])
+                    [{"ml_action_id": ml_action_id, "blue_ml": blue_ml}]
+                )
+
 
 
         # Dark Potion
         elif barrel_delivered.potion_type == [0, 0, 0, 1]:
             dark_ml += barrel_delivered.ml_per_barrel * barrel_delivered.quantity
 
+            # Dark Ledger
             with db.engine.begin() as connection:
                 description = f"Adding this dark_ml {dark_ml}"
                 ml_result_dark = connection.execute(
@@ -191,26 +159,16 @@ def post_deliver_barrels(barrels_delivered: list[Barrel]):
                 ml_action_id = ml_result_dark.scalar()
 
             with db.engine.begin() as connection:
-                dark_result = connection.execute(
-                    sqlalchemy.text(
-                        """
-                        SELECT id
-                        FROM all_ml
-                        WHERE name = 'dark_ml';
-                        """
-                    )
-                )
-                dark_ml_id = dark_result.scalar()
-
-            with db.engine.begin() as connection:
                 catalog_result = connection.execute(
                     sqlalchemy.text(
                         """
-                        INSERT INTO ml_ledger_entries (ml_id, ml_transactions_id, change)
-                        VALUES (:ml_id, :ml_action_id, :dark_ml)
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, dark_ml)
+                        VALUES (:ml_action_id, :dark_ml)
                         """
                     ),
-                    [{"ml_id": dark_ml_id, "ml_action_id": ml_action_id, "dark_ml": dark_ml}])
+                    [{"ml_action_id": ml_action_id, "dark_ml": dark_ml}]
+                )
+
 
         else:
             raise Exception("Invalid potion type")
