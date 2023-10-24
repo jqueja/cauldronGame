@@ -130,31 +130,51 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
             quantity_result = item[2]
             print("-----------")
             print(f" cart id: {cart_id_result}")
+            # What type of potion
             print(f" catalog_id: {catalog_id_result}")
 
             # Truly how much they want
             print(f" quantity: {quantity_result}")
 
+
+
             with db.engine.begin() as connection:
                 catalog_result = connection.execute(
                     sqlalchemy.text(
                         """
-                        SELECT sku, name, inventory, price, potion_type
+                        SELECT sku, name, price, potion_type
                         FROM catalog
                         WHERE id = :catalog_id
                         """
                     ),
                     {"catalog_id": catalog_id_result}
             )
+
+            with db.engine.begin() as connection:
+                sum_dark_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        SELECT SUM(inventory) AS amount
+                        FROM potion_ledger_entries
+                        WHERE potion_id = :catalog_id
+                        """
+                    ),
+                    {"catalog_id": catalog_id_result}
+                )
+                potion_sum_total = sum_dark_result.scalar()
+
+                if potion_sum_total == None:
+                    potion_sum_total = 0
+
             # Can use the Cols
             potion = catalog_result.fetchone()
             print(potion)
-
-            print(quantity_result)
-            print(potion.inventory)
-
+            
             # Pick the most you can sell
-            quantity_to_sell = min(quantity_result, potion.inventory)
+            quantity_to_sell = min(quantity_result, potion_sum_total)
+            
+            print(quantity_result)
+            print(potion_sum_total)
             print(f"Selling this {quantity_to_sell}")
 
             # You can Buy it! 
