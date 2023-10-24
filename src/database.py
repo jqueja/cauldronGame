@@ -78,73 +78,7 @@ def get_dark_potions():
         num_dark = result.scalar()
 
         return num_dark
-    
-def get_red_ml():
-    #print("In the helper GET red mL")
 
-    query = """SELECT num_red_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_red_ml
-    
-def get_green_ml():
-    #print("In the helper GET red mL")
-
-    query = """SELECT num_green_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_green_ml
-    
-def get_blue_ml():
-    #print("In the helper GET red mL")
-
-    query = """SELECT num_blue_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_blue_ml
-    
-def get_blue_ml():
-    #print("In the helper GET red mL")
-
-    query = """SELECT num_blue_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_blue_ml
-    
-def get_dark_ml():
-    #print("In the helper GET red mL")
-
-    query = """SELECT num_dark_ml FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.num_dark_ml
-    
-def get_gold():
-    #print("In the helper GET gold")
-
-    query = """SELECT gold FROM global_inventory"""
-
-    with db.engine.begin() as connection:
-        result = connection.execute(sqlalchemy.text(query))
-        row = result.first()
-
-        return row.gold
-    
 '''
 def set_red_potions(num):
     #print("In the helper SET red potions")

@@ -55,6 +55,108 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
             cur_blue_ml -= blue_index
             cur_dark_ml -= dark_index
 
+
+            # Potion Transaction - id
+            with db.engine.begin() as connection:
+                description = f"Adding this potion {cur_potion.potion_type}"
+                potion_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO potion_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                potions_transaction_id = potion_result.scalar()
+
+            # Catalog id
+            with db.engine.begin() as connection:
+                cur_potion_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        SELECT id
+                        FROM catalog
+                        WHERE potion_type = :cur_potion_type;
+                        """
+                    ),
+                    {"cur_potion_type": cur_potion.potion_type}
+                )
+                cur_potion_id = cur_potion_result.scalar()  
+
+            # Ledger this into our db
+            with db.engine.begin() as connection:
+                catalog_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO potion_ledger_entries (potion_id, potion_transactions_id, inventory)
+                        VALUES (:potion_id, :potion_transactions_id, 1)
+                        """
+                    ),
+                    [{"potion_id": cur_potion_id, "potion_transactions_id": potions_transaction_id}])
+                
+
+            #  Update ml
+            with db.engine.begin() as connection:
+                description = f"Taking away for this potion: {cur_potion.potion_type}"
+                ml_result_red = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_transactions (description)
+                        VALUES (:description)
+                        RETURNING id;
+                        """
+                    ),
+                    {"description": description}
+                )
+                ml_action_id = ml_result_red.scalar()
+
+            # Red ml
+            with db.engine.begin() as connection:
+                red_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, red_ml)
+                        VALUES (:ml_action_id, :red_ml)
+                        """
+                    ),
+                    [{"ml_action_id": ml_action_id, "red_ml": red_index * -1}])
+                
+            # Green ml
+            with db.engine.begin() as connection:
+                green_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, green_ml)
+                        VALUES (:ml_action_id, :green_ml)
+                        """
+                    ),
+                    [{"ml_action_id": ml_action_id, "green_ml": green_index * -1}])
+                
+            # Blue ml
+            with db.engine.begin() as connection:
+                blue_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, blue_ml)
+                        VALUES (:ml_action_id, :blue_ml)
+                        """
+                    ),
+                    [{"ml_action_id": ml_action_id, "blue_ml": blue_index * -1}])
+                
+            # dark ml
+            with db.engine.begin() as connection:
+                dark_result = connection.execute(
+                    sqlalchemy.text(
+                        """
+                        INSERT INTO ml_ledger_entries (ml_transactions_id, dark_ml)
+                        VALUES (:ml_action_id, :dark_ml)
+                        """
+                    ),
+                    [{"ml_action_id": ml_action_id, "dark_ml": dark_index * -1}])
+                
+
             with db.engine.begin() as connection:
                 connection.execute(
                     sqlalchemy.text(

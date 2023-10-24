@@ -126,3 +126,59 @@ def get_gold():
 
         print(cur_gold)
         return cur_gold
+    
+def get_red_ml():
+     with db.engine.begin() as connection:
+        red_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(red_ml) AS amount
+                FROM ml_ledger_entries
+                """),
+        )
+        cur_red_ml = red_result.scalar()
+
+        print(cur_red_ml)
+        return cur_red_ml
+     
+def get_green_ml():
+     with db.engine.begin() as connection:
+        green_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(green_ml) AS amount
+                FROM ml_ledger_entries
+                """),
+        )
+        cur_green_ml = green_result.scalar()
+
+        print(cur_green_ml)
+        return cur_green_ml
+
+def get_blue_ml():
+     with db.engine.begin() as connection:
+        blue_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(blue_ml) AS amount
+                FROM ml_ledger_entries
+                """),
+        )
+        cur_blue_ml = blue_result.scalar()
+
+        print(cur_blue_ml)
+        return cur_blue_ml
+
+def get_dark_ml():
+     with db.engine.begin() as connection:
+        dark_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(dark_ml) AS amount
+                FROM ml_ledger_entries
+                """),
+        )
+        cur_dark_ml = dark_result.scalar()
+
+        print(cur_dark_ml)
+        return cur_dark_ml
