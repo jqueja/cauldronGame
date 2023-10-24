@@ -30,6 +30,7 @@ def reset():
             )
     
     # inventory = 0,
+    '''
     with db.engine.begin() as connection:
             connection.execute(
             sqlalchemy.text(
@@ -38,7 +39,7 @@ def reset():
                 SET inventory = 0
                 """),
             )
-
+    '''
     with db.engine.begin() as connection:
             connection.execute(
             sqlalchemy.text(
