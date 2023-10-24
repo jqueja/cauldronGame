@@ -139,7 +139,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                 catalog_result = connection.execute(
                     sqlalchemy.text(
                         """
-                        SELECT sku, name, inventory, price
+                        SELECT sku, name, inventory, price, potion_type
                         FROM catalog
                         WHERE id = :catalog_id
                         """
@@ -159,19 +159,23 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
             # You can Buy it! 
             if quantity_to_sell > 0:
+
+                gold_gain = quantity_to_sell * potion.price
+
                 print(f"I am SELLING this: {potion}")
                 
+                # Updating the inventory of the potion
                 with db.engine.begin() as connection:
                     result = connection.execute(
                     sqlalchemy.text(
                         """
                         UPDATE catalog
-                        SET inventory = inventory - :cart_quantity
+                        SET inventory = inventory - :quantity_to_sell
                         WHERE id = :catalog_id
                         """),
-                    [{"catalog_id": catalog_id_result, "cart_quantity": quantity_to_sell}])
+                    [{"catalog_id": catalog_id_result, "quantity_to_sell": quantity_to_sell}])
 
-                # Updating global inventory
+                # Updating global inventory - gold
                 with db.engine.begin() as connection:
                     result = connection.execute(
                     sqlalchemy.text(
@@ -180,6 +184,75 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         SET gold = gold + :cart_quantity * :catalog_price
                         """),
                     [{"cart_quantity": quantity_to_sell, "catalog_price": potion.price}])
+
+
+
+                # Potion Transaction - id
+                with db.engine.begin() as connection:
+                    description = f"Selling this potion {potion.name}"
+                    potion_result = connection.execute(
+                        sqlalchemy.text(
+                            """
+                            INSERT INTO potion_transactions (description)
+                            VALUES (:description)
+                            RETURNING id;
+                            """
+                        ),
+                        {"description": description}
+                    )
+                    potions_transaction_id = potion_result.scalar()
+
+                # Catalog id
+                with db.engine.begin() as connection:
+                    cur_potion_result = connection.execute(
+                        sqlalchemy.text(
+                            """
+                            SELECT id
+                            FROM catalog
+                            WHERE potion_type = :cur_potion_type;
+                            """
+                        ),
+                        {"cur_potion_type": potion.potion_type}
+                    )
+                    cur_potion_id = cur_potion_result.scalar()  
+
+                # Ledger this into our db
+                with db.engine.begin() as connection:
+                    catalog_result = connection.execute(
+                        sqlalchemy.text(
+                            """
+                            INSERT INTO potion_ledger_entries (potion_id, potion_transactions_id, inventory)
+                            VALUES (:potion_id, :potion_transactions_id, :potion_sell)
+                            """
+                        ),
+                        [{"potion_id": cur_potion_id, "potion_transactions_id": potions_transaction_id, "potion_sell": quantity_to_sell}])
+
+
+                # Updating Gain on Gold
+                with db.engine.begin() as connection:
+                    description = f"Selling this potion: {potion.name} for {gold_gain}"
+                    catalog_result = connection.execute(
+                        sqlalchemy.text(
+                            """
+                            INSERT INTO gold_transactions (description)
+                            VALUES (:description)
+                            RETURNING id;
+                            """
+                        ),
+                        {"description": description}
+                    )
+                    gold_action_id = catalog_result.scalar()
+
+                
+                with db.engine.begin() as connection:
+                        catalog_result = connection.execute(
+                            sqlalchemy.text(
+                                """
+                                INSERT INTO gold_ledger_entries (gold_transactions_id, change)
+                                VALUES (:gold_action_id, :change)
+                                """
+                            ),
+                            {"gold_action_id": gold_action_id, "change":gold_gain})
 
             else:
                 raise HTTPException(
