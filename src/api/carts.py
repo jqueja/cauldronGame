@@ -195,6 +195,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         """),
                     [{"catalog_id": catalog_id_result, "quantity_to_sell": quantity_to_sell}])
 
+                '''
                 # Updating global inventory - gold
                 with db.engine.begin() as connection:
                     result = connection.execute(
@@ -204,7 +205,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         SET gold = gold + :cart_quantity * :catalog_price
                         """),
                     [{"cart_quantity": quantity_to_sell, "catalog_price": potion.price}])
-
+                '''
 
 
                 # Potion Transaction - id

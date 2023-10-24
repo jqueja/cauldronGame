@@ -180,7 +180,7 @@ def get_bottle_plan():
             empty_potions = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT name, potion_type,
+                SELECT name, potion_type
                 FROM catalog
                 ORDER BY catalog.priority ASC
                 """
