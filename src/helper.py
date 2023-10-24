@@ -6,113 +6,6 @@ import sqlalchemy
 from src import database as db
 
 
-def red_potion_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE catalog
-                SET 
-                quantity = quantity + :num
-                WHERE sku = 'RED_POTION'
-                """),
-        [{"num": num, }])
-
-def red_ml_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE global_inventory
-                SET
-                num_red_ml = num_red_ml + :num
-                """),
-        [{"num": num, }])
-
-
-
-
-def green_potion_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE catalog
-                SET 
-                quantity = quantity + :num
-                WHERE sku = 'GREEN_POTION'
-                """),
-        [{"num": num, }])
-
-def green_ml_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE global_inventory
-                SET
-                num_green_ml = num_green_ml + :num
-                """),
-        [{"num": num, }])
-
-
-def blue_potion_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE catalog
-                SET 
-                quantity = quantity + :num
-                WHERE sku = 'BLUE_POTION'
-                """),
-        [{"num": num, }])
-
-def blue_ml_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE global_inventory
-                SET
-                num_blue_ml = num_blue_ml + :num
-                """),
-        [{"num": num, }])
-
-def dark_potion_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE catalog
-                SET 
-                quantity = quantity + :num
-                WHERE sku = 'DARK_POTION'
-                """),
-        [{"num": num, }])
-
-def dark_ml_change(num):
-   
-   with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE global_inventory
-                SET
-                num_dark_ml = num_dark_ml + :num
-                """),
-        [{"num": num, }])        
-
-    # what do I return (how can I add some error checking in my code)
-
-
 def get_gold():
     with db.engine.begin() as connection:
         gold_result = connection.execute(
@@ -182,3 +75,130 @@ def get_dark_ml():
 
         print(cur_dark_ml)
         return cur_dark_ml
+     
+def get_red_potions():
+    with db.engine.begin() as connection:
+        red_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id
+                FROM catalog
+                WHERE name = 'red potion';
+                """
+            ),
+        )
+        red_id = red_result.scalar()
+        print(f"This is the red id: {red_id}")
+
+    with db.engine.begin() as connection:
+        sum_red_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(inventory) AS amount
+                FROM potion_ledger_entries
+                WHERE potion_id = :red_id
+                """ 
+                ),
+                {"red_id": red_id}
+        )
+        red_sum = sum_red_result.scalar()
+
+        if red_sum is None:
+            return 0
+
+        print(red_sum)
+        return red_sum
+    
+def get_green_potions():
+    with db.engine.begin() as connection:
+        green_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id
+                FROM catalog
+                WHERE name = 'green potion';
+                """
+            ),
+        )
+        green_id = green_result.scalar()
+        print(f"This is the green id: {green_id}")
+
+    with db.engine.begin() as connection:
+        sum_green_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(inventory) AS amount
+                FROM potion_ledger_entries
+                WHERE potion_id = :green_id
+                """ 
+                ),
+                {"green_id": green_id}
+        )
+        green_sum = sum_green_result.scalar()
+
+        if green_sum is None:
+            return 0
+
+        return green_sum
+    
+def get_blue_potions():
+    with db.engine.begin() as connection:
+        blue_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id
+                FROM catalog
+                WHERE name = 'blue potion';
+                """
+            ),
+        )
+        blue_id = blue_result.scalar()
+
+    with db.engine.begin() as connection:
+        sum_blue_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(inventory) AS amount
+                FROM potion_ledger_entries
+                WHERE potion_id = :blue_id
+                """
+            ),
+            {"blue_id": blue_id}
+        )
+        blue_sum = sum_blue_result.scalar()
+
+        if blue_sum is None:
+            return 0
+
+        return blue_sum
+
+def get_dark_potions():
+    with db.engine.begin() as connection:
+        dark_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id
+                FROM catalog
+                WHERE name = 'dark potion';
+                """
+            ),
+        )
+        dark_id = dark_result.scalar()
+
+    with db.engine.begin() as connection:
+        sum_dark_result = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(inventory) AS amount
+                FROM potion_ledger_entries
+                WHERE potion_id = :dark_id
+                """
+            ),
+            {"dark_id": dark_id}
+        )
+        dark_sum = sum_dark_result.scalar()
+
+        if dark_sum is None:
+            return 0
+
+        return dark_sum

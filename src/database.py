@@ -30,7 +30,7 @@ def get_red_potions():
         num_red = result.scalar()
 
         return num_red
-    
+'''
 def get_green_potions():
     #print("In the helper GET red potions")
 
@@ -79,7 +79,7 @@ def get_dark_potions():
 
         return num_dark
 
-'''
+
 def set_red_potions(num):
     #print("In the helper SET red potions")
 
