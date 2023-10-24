@@ -225,7 +225,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                             VALUES (:potion_id, :potion_transactions_id, :potion_sell)
                             """
                         ),
-                        [{"potion_id": cur_potion_id, "potion_transactions_id": potions_transaction_id, "potion_sell": quantity_to_sell}])
+                        [{"potion_id": cur_potion_id, "potion_transactions_id": potions_transaction_id, "potion_sell": quantity_to_sell * -1}])
 
 
                 # Updating Gain on Gold

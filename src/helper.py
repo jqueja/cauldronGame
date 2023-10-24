@@ -31,6 +31,9 @@ def get_red_ml():
         )
         cur_red_ml = red_result.scalar()
 
+        if cur_red_ml == None:
+            return 0
+        
         print(cur_red_ml)
         return cur_red_ml
      
@@ -44,6 +47,9 @@ def get_green_ml():
                 """),
         )
         cur_green_ml = green_result.scalar()
+
+        if cur_green_ml == None:
+            return 0
 
         print(cur_green_ml)
         return cur_green_ml
@@ -59,6 +65,9 @@ def get_blue_ml():
         )
         cur_blue_ml = blue_result.scalar()
 
+        if cur_blue_ml == None:
+            return 0
+
         print(cur_blue_ml)
         return cur_blue_ml
 
@@ -72,6 +81,9 @@ def get_dark_ml():
                 """),
         )
         cur_dark_ml = dark_result.scalar()
+
+        if cur_dark_ml == None:
+            return 0
 
         print(cur_dark_ml)
         return cur_dark_ml
