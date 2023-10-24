@@ -156,7 +156,7 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                     ),
                     [{"ml_action_id": ml_action_id, "dark_ml": dark_index * -1}])
                 
-
+            '''
             with db.engine.begin() as connection:
                 connection.execute(
                     sqlalchemy.text(
@@ -166,18 +166,9 @@ def post_deliver_bottles(potions_delivered: list[PotionInventory]):
                         WHERE potion_type = :potion_type
                         """),
                 [{"potion_type": cur_potion.potion_type}])
+            '''
 
-    with db.engine.begin() as connection:
-        connection.execute(
-            sqlalchemy.text(
-                """
-                UPDATE global_inventory SET
-                num_red_ml = :red_ml,
-                num_green_ml = :green_ml,
-                num_blue_ml = :blue_ml,
-                num_dark_ml = :dark_ml
-                """),
-        [{"red_ml": cur_red_ml, "green_ml": cur_green_ml, "blue_ml": cur_blue_ml, "dark_ml": cur_dark_ml}])
+  
     
     return "ok"
     
@@ -189,7 +180,7 @@ def get_bottle_plan():
             empty_potions = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT name, potion_type, inventory
+                SELECT name, potion_type,
                 FROM catalog
                 ORDER BY catalog.priority ASC
                 """
