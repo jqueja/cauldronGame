@@ -100,7 +100,6 @@ def get_red_potions():
             ),
         )
         red_id = red_result.scalar()
-        print(f"This is the red id: {red_id}")
 
     with db.engine.begin() as connection:
         sum_red_result = connection.execute(
@@ -133,7 +132,6 @@ def get_green_potions():
             ),
         )
         green_id = green_result.scalar()
-        print(f"This is the green id: {green_id}")
 
     with db.engine.begin() as connection:
         sum_green_result = connection.execute(
