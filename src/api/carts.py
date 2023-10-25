@@ -184,6 +184,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
 
                 print(f"I am SELLING this: {potion}")
                 
+                '''
                 # Updating the inventory of the potion
                 with db.engine.begin() as connection:
                     result = connection.execute(
@@ -195,7 +196,7 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                         """),
                     [{"catalog_id": catalog_id_result, "quantity_to_sell": quantity_to_sell}])
 
-                '''
+                
                 # Updating global inventory - gold
                 with db.engine.begin() as connection:
                     result = connection.execute(
