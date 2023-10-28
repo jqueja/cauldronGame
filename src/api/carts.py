@@ -56,15 +56,19 @@ def search_orders(
     Your results must be paginated, the max results you can return at any
     time is 5 total line items.
     """
-    return
-
-
-
-
-
-
-
-
+    return {
+        "previous": "",
+        "next": "",
+        "results": [
+            {
+                "line_item_id": 1,
+                "item_sku": "1 oblivion potion",
+                "customer_name": "Scaramouche",
+                "line_item_total": 50,
+                "timestamp": "2021-01-01T00:00:00Z",
+            }
+        ],
+    }
 
     # filter only if name parameter is passed
     if customer_name != "":
