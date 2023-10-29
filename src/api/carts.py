@@ -93,8 +93,6 @@ def search_orders(
             cart_items ON cart.cart_id = cart_items.cart_id
             JOIN
             catalog ON cart_items.catalog_id = catalog.id
-            WHERE
-            cart_items.checked_out = true;
             """
         )
     )
