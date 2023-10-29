@@ -107,6 +107,13 @@ def search_orders(
 
     line_item_id = 1
 
+    json.append(
+        {
+        "previous": "",
+        "next": "",
+        }
+    )
+
     for row in data:
         sku_string = str(row.quantity) + row.purchased_item
 
@@ -115,8 +122,30 @@ def search_orders(
         print(row.customer_name)
         print(row.gold)
         print(row.purchase_time)
-        
+
+        lst = []
+
+        lst.append(
+            {
+                    "line_item_id": line_item_id,
+                    "item_sku": sku_string,
+                    "customer_name": row.customer_name,
+                    "line_item_total": row.gold,
+                    "timestamp": row.purchase_time,
+            }
+        )
+
         json.append(
+            {
+                "results": lst
+            }
+        )
+
+        
+    return json
+
+'''
+json.append(
             {
                 "previous": "",
                 "next": "",
@@ -132,9 +161,8 @@ def search_orders(
                 ],
             }
         )
+'''
 
-        
-    return json
 
 
 class NewCart(BaseModel):
