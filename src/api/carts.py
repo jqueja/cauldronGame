@@ -77,6 +77,22 @@ def search_orders(
         return False
     '''
 
+    return {
+        "previous": "",
+        "next": "",
+        "results": [
+            {
+                "line_item_id": 1,
+                "item_sku": "1 oblivion potion",
+                "customer_name": "Scaramouche",
+                "line_item_total": 50,
+                "timestamp": "2021-01-01T00:00:00Z",
+            }
+        ],
+    }
+
+
+
     with db.engine.begin() as connection:
         result = connection.execute(
         sqlalchemy.text(
@@ -107,21 +123,6 @@ def search_orders(
 
     for row in data:
         sku_string = str(row.quantity) + row.purchased_item
-
-
-        return {
-        "previous": "",
-        "next": "",
-        "results": [
-            {
-                "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
-            }
-        ],
-    }
         
         json.append(
             {
