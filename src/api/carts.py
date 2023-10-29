@@ -98,7 +98,6 @@ def search_orders(
             """
         )
     )
-
     # Fetch all rows from the result
     data = result.fetchall()
     json = []

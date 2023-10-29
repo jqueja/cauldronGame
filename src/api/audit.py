@@ -38,8 +38,4 @@ def post_audit_results(audit_explanation: Result):
     """ """
     print(audit_explanation)
 
-    return{
-    "gold_match": audit_explanation.gold_match,
-    "barrels_match": audit_explanation.barrels_match,
-    "potions_match": audit_explanation.potions_match,
-    }
+    return "ok"
