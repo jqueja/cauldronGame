@@ -8,6 +8,8 @@ from src import database as db
 
 from ..database import *
 
+import json
+
 router = APIRouter(
     prefix="/carts",
     tags=["cart"],
@@ -56,63 +58,77 @@ def search_orders(
     Your results must be paginated, the max results you can return at any
     time is 5 total line items.
     """
-    return {
-        "previous": "",
-        "next": "",
-        "results": [
-            {
-                "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
-            }
-        ],
-    }
 
-    # filter only if name parameter is passed
-    if customer_name != "":
-        stmt = stmt.where(db.movies.c.title.ilike(f"%{customer_name}%"))
+    # Customer is filled out
 
-    with db.engine.connect() as conn:
-        result = conn.execute(stmt)
-        json = []
-        for row in result:
-            json.append(
-                {
-                    "previous": "",
-                    "next": "",
-                    "results": 
-                    [
-                    {
-                        "line_item_id": 1,
-                        "item_sku": "1 oblivion potion",
-                        "customer_name": "Scaramouche",
-                        "line_item_total": 50,
-                        "timestamp": "2021-01-01T00:00:00Z",
-                    }
-                    ],
-                }
-            )
+    '''
+    if customer_name and not potion_sku:
+        pass
 
-    return json
+    # Potion is filled out
+    elif not customer_name and potion_sku:
+        pass
     
+    # Customer AND Potion is filled out
+    elif customer_name and potion_sku:
+        pass
+    
+    else:
+        return False
+    '''
 
+    with db.engine.begin() as connection:
+        result = connection.execute(
+        sqlalchemy.text(
+            """
+            SELECT
+            cart.customer AS customer_name,
+            catalog.name AS purchased_item,
+            cart_items.quantity AS quantity,
+            cart_items.time AS purchase_time,
+            (catalog.price * cart_items.quantity) AS gold
+            FROM
+            cart
+            JOIN
+            cart_items ON cart.cart_id = cart_items.cart_id
+            JOIN
+            catalog ON cart_items.catalog_id = catalog.id
+            WHERE
+            cart_items.checked_out = true;
+            """
+        )
+    )
 
+    # Fetch all rows from the result
+    data = result.fetchall()
+    json = []
 
-    return {
-        "previous": "",
-        "next": "",
-        "results": [
+    print(len(data))
+
+    line_item_id = 1
+
+    for row in data:
+        sku_string = str(row.quantity) + row.purchased_item
+        
+        json.append(
             {
-                "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
+                "previous": "",
+                "next": "",
+                "results": 
+                [
+                {
+                    "line_item_id": line_item_id,
+                    "item_sku": sku_string,
+                    "customer_name": row.customer_name,
+                    "line_item_total": row.gold,
+                    "timestamp": row.purchase_time,
+                }
+                ],
             }
-        ],
-    }
+        )
+        line_item_id += 1
+        
+    return json
 
 
 class NewCart(BaseModel):
@@ -208,6 +224,8 @@ class CartCheckout(BaseModel):
 @router.post("/{cart_id}/checkout")
 def checkout(cart_id: int, cart_checkout: CartCheckout):
 
+    print("Calling check out")
+
     with db.engine.begin() as connection:
         cart_item_result = connection.execute(
             sqlalchemy.text(
@@ -221,6 +239,8 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
         )
 
         cart_items = cart_item_result.fetchall()
+
+        print(cart_items)
     
         for item in cart_items:
             cart_id_result = item[0]
@@ -373,6 +393,19 @@ def checkout(cart_id: int, cart_checkout: CartCheckout):
                                 """
                             ),
                             {"gold_action_id": gold_action_id, "change":gold_gain})
+                
+                # Update the boolean
+                with db.engine.begin() as connection:
+                    cart_item_result = connection.execute(
+                        sqlalchemy.text(
+                            """
+                            UPDATE cart_items
+                            SET checked_out = :checked_out
+                            WHERE cart_id = :cart_id
+                            """
+                        ),
+                        {"checked_out": True, "cart_id": cart_id}
+                    )
 
             else:
                 raise HTTPException(
