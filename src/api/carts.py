@@ -126,7 +126,6 @@ def search_orders(
                 ],
             }
         )
-        line_item_id += 1
         
     return json
 
