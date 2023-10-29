@@ -77,22 +77,6 @@ def search_orders(
         return False
     '''
 
-    return {
-        "previous": "",
-        "next": "",
-        "results": [
-            {
-                "line_item_id": 1,
-                "item_sku": "1 oblivion potion",
-                "customer_name": "Scaramouche",
-                "line_item_total": 50,
-                "timestamp": "2021-01-01T00:00:00Z",
-            }
-        ],
-    }
-
-
-
     with db.engine.begin() as connection:
         result = connection.execute(
         sqlalchemy.text(
@@ -109,6 +93,8 @@ def search_orders(
             cart_items ON cart.cart_id = cart_items.cart_id
             JOIN
             catalog ON cart_items.catalog_id = catalog.id
+            WHERE
+            cart_items.checked_out = True
             """
         )
     )
@@ -117,17 +103,24 @@ def search_orders(
     data = result.fetchall()
     json = []
 
+    print(data)
     print(len(data))
 
     line_item_id = 1
 
     for row in data:
         sku_string = str(row.quantity) + row.purchased_item
+
+        print(line_item_id)
+        print(sku_string)
+        print(row.customer_name)
+        print(row.gold)
+        print(row.purchase_time)
         
         json.append(
             {
-                "previous": 0,
-                "next": 1,
+                "previous": "",
+                "next": "",
                 "results": 
                 [
                 {
@@ -141,7 +134,6 @@ def search_orders(
             }
         )
 
-    print(json)
         
     return json
 
