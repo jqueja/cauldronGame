@@ -77,7 +77,8 @@ def search_orders(
     
     # Customer AND Potion is filled out
     elif customer_name and potion_sku:
-        sort_col = f"{customer_name}, {potion_sku}"
+        sort_col = 'cart.customer, catalog.name'  # Sort by both columns
+        sort_value = f"{customer_name}, {potion_sku}"
     
 
     with db.engine.begin() as connection:
