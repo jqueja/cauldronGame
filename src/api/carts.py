@@ -109,7 +109,7 @@ def search_orders(
 
 
     for row in data:
-        sku_string = str(row.quantity) + row.purchased_item
+        sku_string = f"{row.quantity} {row.purchased_item}"
 
         print(line_item_id)
         print(sku_string)
