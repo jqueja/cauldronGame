@@ -67,11 +67,13 @@ def search_orders(
     
     # Customer is filled out
     if customer_name and not potion_sku:
-        sort_col = customer_name
+        sort_col = 'cart.customer'
+        sort_value = customer_name
 
     # Potion is filled out
     elif not customer_name and potion_sku:
-        sort_col = potion_sku
+        sort_col = 'catalog.name'
+        sort_value = potion_sku
     
     # Customer AND Potion is filled out
     elif customer_name and potion_sku:
@@ -97,7 +99,7 @@ def search_orders(
                 catalog ON cart_items.catalog_id = catalog.id
                 WHERE
                 cart_items.checked_out = True
-                AND cart.customer LIKE '{sort_col}'
+                AND {sort_col} LIKE '{sort_value}'
                 LIMIT {page_size}
                 OFFSET {offset};
                 """
