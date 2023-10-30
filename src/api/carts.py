@@ -63,14 +63,8 @@ def search_orders(
 
     # Determine the offset based on the search_page token
     offset = 0
-    if search_page:
-        try:
-            offset = int(search_page)
-        except ValueError:
-            return {"error": "Invalid search_page token"}
-        
-
-
+   
+    
     # Customer is filled out
     if customer_name and not potion_sku:
         sort_col = customer_name
