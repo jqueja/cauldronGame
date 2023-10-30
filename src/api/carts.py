@@ -100,19 +100,13 @@ def search_orders(
     )
     # Fetch all rows from the result
     data = result.fetchall()
-    json = []
+    lst = []
 
     print(data)
     print(len(data))
 
     line_item_id = 1
 
-    json.append(
-        {
-        "previous": "",
-        "next": "",
-        }
-    )
 
     for row in data:
         sku_string = str(row.quantity) + row.purchased_item
@@ -122,8 +116,6 @@ def search_orders(
         print(row.customer_name)
         print(row.gold)
         print(row.purchase_time)
-
-        lst = []
 
         lst.append(
             {
@@ -135,14 +127,11 @@ def search_orders(
             }
         )
 
-        json.append(
-            {
-                "results": lst
-            }
-        )
-
-        
-    return json
+    return {
+        "previous": "",
+        "next": "",
+        "results": lst
+    }
 
 '''
 json.append(
