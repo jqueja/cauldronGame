@@ -96,7 +96,8 @@ def search_orders(
                 catalog.name AS purchased_item,
                 cart_items.quantity AS quantity,
                 cart_items.time AS purchase_time,
-                (catalog.price * cart_items.quantity) AS gold
+                (catalog.price * cart_items.quantity) AS gold,
+                cart_items.checked_out AS checked_out
                 FROM
                 cart
                 JOIN
@@ -105,7 +106,7 @@ def search_orders(
                 catalog ON cart_items.catalog_id = catalog.id
                 WHERE
                 cart_items.checked_out = True
-                ORDER BY {sort_col} {sort_order}
+                AND cart.customer LIKE '{sort_col}'
                 LIMIT {page_size}
                 OFFSET {offset};
                 """
