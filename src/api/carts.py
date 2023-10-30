@@ -77,9 +77,6 @@ def search_orders(
     elif customer_name and potion_sku:
         sort_col = f"{customer_name}, {potion_sku}"
     
-    else:
-        return False
-    
 
     with db.engine.begin() as connection:
         result = connection.execute(
