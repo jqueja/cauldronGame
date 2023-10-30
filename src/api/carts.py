@@ -59,45 +59,59 @@ def search_orders(
     time is 5 total line items.
     """
 
-    # Customer is filled out
+    page_size = 5
 
-    '''
+    # Determine the offset based on the search_page token
+    offset = 0
+    if search_page:
+        try:
+            offset = int(search_page)
+        except ValueError:
+            return {"error": "Invalid search_page token"}
+        
+
+
+    # Customer is filled out
     if customer_name and not potion_sku:
-        pass
+        sort_col = customer_name
 
     # Potion is filled out
     elif not customer_name and potion_sku:
-        pass
+        sort_col = potion_sku
     
     # Customer AND Potion is filled out
     elif customer_name and potion_sku:
-        pass
+        sort_col = f"{customer_name}, {potion_sku}"
     
     else:
         return False
-    '''
+    
 
     with db.engine.begin() as connection:
         result = connection.execute(
-        sqlalchemy.text(
-            """
-            SELECT
-            cart.customer AS customer_name,
-            catalog.name AS purchased_item,
-            cart_items.quantity AS quantity,
-            cart_items.time AS purchase_time,
-            (catalog.price * cart_items.quantity) AS gold
-            FROM
-            cart
-            JOIN
-            cart_items ON cart.cart_id = cart_items.cart_id
-            JOIN
-            catalog ON cart_items.catalog_id = catalog.id
-            WHERE
-            cart_items.checked_out = True
-            """
+            sqlalchemy.text(
+                f"""
+                SELECT
+                cart.customer AS customer_name,
+                catalog.name AS purchased_item,
+                cart_items.quantity AS quantity,
+                cart_items.time AS purchase_time,
+                (catalog.price * cart_items.quantity) AS gold
+                FROM
+                cart
+                JOIN
+                cart_items ON cart.cart_id = cart_items.cart_id
+                JOIN
+                catalog ON cart_items.catalog_id = catalog.id
+                WHERE
+                cart_items.checked_out = True
+                ORDER BY {sort_col} {sort_order}
+                LIMIT {page_size}
+                OFFSET {offset};
+                """
+            )
         )
-    )
+
     # Fetch all rows from the result
     data = result.fetchall()
     lst = []
@@ -132,27 +146,6 @@ def search_orders(
         "next": "",
         "results": lst
     }
-
-'''
-json.append(
-            {
-                "previous": "",
-                "next": "",
-                "results": 
-                [
-                {
-                    "line_item_id": line_item_id,
-                    "item_sku": sku_string,
-                    "customer_name": row.customer_name,
-                    "line_item_total": row.gold,
-                    "timestamp": row.purchase_time,
-                }
-                ],
-            }
-        )
-'''
-
-
 
 class NewCart(BaseModel):
     customer: str
