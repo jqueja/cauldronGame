@@ -63,22 +63,30 @@ def search_orders(
 
     # Determine the offset based on the search_page token
     offset = 0
-   
-    
-    # Customer is filled out
-    if customer_name and not potion_sku:
-        sort_col = 'cart.customer'
-        sort_value = customer_name
 
-    # Potion is filled out
-    elif not customer_name and potion_sku:
-        sort_col = 'catalog.name'
-        sort_value = potion_sku
-    
-    # Customer AND Potion is filled out
-    elif customer_name and potion_sku:
-        sort_col = 'cart.customer, catalog.name'  # Sort by both columns
-        sort_value = f"{customer_name}, {potion_sku}"
+    if search_page == "":
+        offset = 0
+
+    else:
+        offset = int(search_page)
+
+
+    if offset == 0:
+        prev_page = ""
+
+    else:
+        prev_page = offset - 5
+        next_page = offset + 5
+
+    # If search_page is "" then offset is 0
+
+    #  other wise search_page is the offset (make sure it is an int)
+    # 
+    # If offset is 0 prev is empty string
+
+    # else
+    #  prev: offset - 5, offset + 5 for next
+
     
 
     with db.engine.begin() as connection:
@@ -100,12 +108,15 @@ def search_orders(
                 catalog ON cart_items.catalog_id = catalog.id
                 WHERE
                 cart_items.checked_out = True
-                AND {sort_col} LIKE '{sort_value}'
+                AND cart.customer ILIKE '%{customer_name}%'
+                AND catalog.name ILIKE '%{potion_sku}%'
                 LIMIT {page_size}
                 OFFSET {offset};
                 """
             )
         )
+
+        # ORDER BY order_by order
 
     # Fetch all rows from the result
     data = result.fetchall()
@@ -113,6 +124,12 @@ def search_orders(
 
     print(data)
     print(len(data))
+
+    if len(data) > 5:
+        next_page = 5
+
+    else:
+        next_page =  ""
 
     line_item_id = 1
 
@@ -137,8 +154,8 @@ def search_orders(
         )
 
     return {
-        "previous": "",
-        "next": "",
+        "previous": prev_page,
+        "next": next_page,
         "results": lst
     }
 
