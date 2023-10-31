@@ -78,22 +78,12 @@ def search_orders(
         prev_page = offset - 5
         next_page = offset + 5
 
-    # If search_page is "" then offset is 0
-
-    #  other wise search_page is the offset (make sure it is an int)
-    # 
-    # If offset is 0 prev is empty string
-
-    # else
-    #  prev: offset - 5, offset + 5 for next
-
-    
-
     with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
                 f"""
                 SELECT
+                cart.cart_id AS id,
                 cart.customer AS customer_name,
                 catalog.name AS purchased_item,
                 cart_items.quantity AS quantity,
@@ -131,13 +121,12 @@ def search_orders(
     else:
         next_page =  ""
 
-    line_item_id = 1
-
 
     for row in data:
         sku_string = f"{row.quantity} {row.purchased_item}"
 
-        print(line_item_id)
+        print(row.id)
+
         print(sku_string)
         print(row.customer_name)
         print(row.gold)
@@ -145,7 +134,7 @@ def search_orders(
 
         lst.append(
             {
-                    "line_item_id": line_item_id,
+                    "line_item_id": row.id,
                     "item_sku": sku_string,
                     "customer_name": row.customer_name,
                     "line_item_total": row.gold,
