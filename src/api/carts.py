@@ -62,7 +62,6 @@ def search_orders(
     page_size = 5
 
     # Determine the offset based on the search_page token
-    offset = 0
 
     if search_page == "":
         offset = 0
@@ -71,12 +70,14 @@ def search_orders(
         offset = int(search_page)
 
 
-    if offset == 0:
-        prev_page = ""
+
+    # Not negative
+    if offset - 5 >= 0:
+        prev_page = offset - 5
 
     else:
-        prev_page = offset - 5
-        next_page = offset + 5
+        prev_page = ""
+
 
     with db.engine.begin() as connection:
         result = connection.execute(
@@ -115,11 +116,12 @@ def search_orders(
     print(data)
     print(len(data))
 
-    if len(data) > 5:
-        next_page = 5
+    # Not negative
+    if offset + 5 > len(data):
+        next_page = ""
 
     else:
-        next_page =  ""
+        next_page =  offset + 5
 
 
     for row in data:
