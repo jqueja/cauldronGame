@@ -99,6 +99,23 @@ def search_orders(
 
 
     with db.engine.begin() as connection:
+        result_len = connection.execute(
+            sqlalchemy.text(
+                f"""
+                SELECT COUNT(*)
+                FROM
+                cart
+                JOIN cart_items ON cart.cart_id = cart_items.cart_id
+                JOIN catalog ON cart_items.catalog_id = catalog.id
+                WHERE
+                cart_items.checked_out = True
+                """
+            )
+        )
+
+    len_of_data = result_len.scalar()
+
+    with db.engine.begin() as connection:
         result = connection.execute(
             sqlalchemy.text(
                 f"""
@@ -124,7 +141,7 @@ def search_orders(
                 {sort_by_col} {sort_by_order}
                 LIMIT {page_size}
                 OFFSET {offset};
-                
+
                 """
             )
         )
@@ -139,7 +156,7 @@ def search_orders(
     print(len(data))
 
     # Not negative
-    if offset + 5 > len(data):
+    if offset + 5 > len_of_data:
         next_page = ""
 
     else:
