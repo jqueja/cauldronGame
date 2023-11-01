@@ -72,7 +72,7 @@ def search_orders(
     elif sort_col == search_sort_options.line_item_total:
         sort_by_col == "gold"
 
-    if sort_by_order == search_sort_order.asc:
+    if sort_order == search_sort_order.asc:
         sort_by_order = 'asc'
 
 
