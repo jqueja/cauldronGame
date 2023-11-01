@@ -70,7 +70,7 @@ def search_orders(
         sort_by_col = "item_sku"
 
     elif sort_col == search_sort_options.line_item_total:
-        sort_by_col == "gold"
+        sort_by_col = "gold"
 
     if sort_order == search_sort_order.asc:
         sort_by_order = 'asc'
@@ -114,11 +114,7 @@ def search_orders(
         )
 
     len_of_data = result_len.scalar()
-
-    with db.engine.begin() as connection:
-        result = connection.execute(
-            sqlalchemy.text(
-                f"""
+    query = f"""
                 SELECT
                 cart.cart_id AS id,
                 cart.customer AS customer_name,
@@ -143,6 +139,11 @@ def search_orders(
                 OFFSET {offset};
 
                 """
+    print(f"search query: {query}")
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                query
             )
         )
 
