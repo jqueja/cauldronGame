@@ -59,6 +59,25 @@ def search_orders(
     time is 5 total line items.
     """
 
+    sort_by_col = "timestamp"
+
+    sort_by_order = "desc"
+
+    if sort_col == search_sort_options.customer_name:
+        sort_by_col = "customer_name"
+
+    elif sort_col == search_sort_options.item_sku:
+        sort_by_col = "item_sku"
+
+    elif sort_col == search_sort_options.line_item_total:
+        sort_by_col == "gold"
+
+    if sort_by_order == search_sort_order.asc:
+        sort_by_order = 'asc'
+
+
+
+
     page_size = 5
 
     # Determine the offset based on the search_page token
@@ -86,9 +105,9 @@ def search_orders(
                 SELECT
                 cart.cart_id AS id,
                 cart.customer AS customer_name,
-                catalog.name AS purchased_item,
+                catalog.name AS item_sku,
                 cart_items.quantity AS quantity,
-                cart_items.time AS purchase_time,
+                cart_items.time AS timestamp,
                 (catalog.price * cart_items.quantity) AS gold,
                 cart_items.checked_out AS checked_out
                 FROM
@@ -101,13 +120,16 @@ def search_orders(
                 cart_items.checked_out = True
                 AND cart.customer ILIKE '%{customer_name}%'
                 AND catalog.name ILIKE '%{potion_sku}%'
+                ORDER BY
+                {sort_by_col} {sort_by_order}
                 LIMIT {page_size}
                 OFFSET {offset};
+                
                 """
             )
         )
 
-        # ORDER BY order_by order
+        # ORDER BY order_by order ORDER BY {sort_col} {sort_order}
 
     # Fetch all rows from the result
     data = result.fetchall()
@@ -125,14 +147,14 @@ def search_orders(
 
 
     for row in data:
-        sku_string = f"{row.quantity} {row.purchased_item}"
+        sku_string = f"{row.quantity} {row.item_sku}"
 
         print(row.id)
 
         print(sku_string)
         print(row.customer_name)
         print(row.gold)
-        print(row.purchase_time)
+        print(row.timestamp)
 
         lst.append(
             {
@@ -140,7 +162,7 @@ def search_orders(
                     "item_sku": sku_string,
                     "customer_name": row.customer_name,
                     "line_item_total": row.gold,
-                    "timestamp": row.purchase_time,
+                    "timestamp": row.timestamp,
             }
         )
 
