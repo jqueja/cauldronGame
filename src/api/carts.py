@@ -73,7 +73,7 @@ def search_orders(
 
     # Not negative
     if offset - 5 >= 0:
-        prev_page = offset - 5
+        prev_page = str(offset - 5)
 
     else:
         prev_page = ""
@@ -121,7 +121,7 @@ def search_orders(
         next_page = ""
 
     else:
-        next_page =  offset + 5
+        next_page = str(offset + 5)
 
 
     for row in data:
